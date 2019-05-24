@@ -12,3 +12,7 @@ h3 {
   color: #FFFFFF;
   font-family: Arial, Helvetica, sans-serif;
 }
+
+img {
+  filter: brightness(150%);
+}
