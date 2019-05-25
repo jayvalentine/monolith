@@ -233,6 +233,7 @@ class Game {
       else {
         $(`#choice-${i}`).removeClass('clickable');
         $(`#choice-${i}`).addClass('choice');
+        $(`#choice-${i}`).removeAttr('id');
       }
     }
 
