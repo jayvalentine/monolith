@@ -7,18 +7,26 @@ class Game {
 
   private regions: Region[]; 
 
-  private messages: string[];
+  private events: string[][];
+
+  private choiceFlag : boolean;
+  private choiceIndex : number;
+  private choices : string[];
 
   constructor() {
     this.day = 0;
     this.regions = [];
-    this.messages = [];
+    this.events = [];
+    this.choiceFlag = false;
+    this.choices = [];
   }
 
   start() {
     this.day = 0;
     this.regions = [];
-    this.messages = [];
+    this.events = [];
+    this.choiceFlag = false;
+    this.choices = [];
 
     // Generate a number of regions.
     const regionLimit : number = Random.interval(30, 50);
@@ -62,23 +70,48 @@ class Game {
       on the planet below.`
     );
 
+    let landingSiteChoices : string[] = [];
+
     for (let r of landingSites) {
-      this.queueMessage(
-        `${r.typeString()} with ${r.foodString()} food,
+      landingSiteChoices.push(
+        `A ${r.typeString()} region with ${r.foodString()} food,
         ${r.waterString()} water, and ${r.resourcesString()} resources.
         It has ${r.population()} inhabitants, split into ${r.tribesCount()} tribe(s).`
       );
     }
 
+    this.queueChoice(landingSiteChoices);
+
     this.run();
   }
 
   run() {
-    // Check to see if any messages need displaying.
-    console.log(this.messages.length);
-    if (this.messages.length > 0) {
-      this.displayMessage(this.messages.shift());
+    // Are we making a choice? If so, we give that priority over everything else.
+    if (this.choiceFlag == true) {
+      // Have we displayed all the choices yet? If not, display the next one.
+      if (this.choiceIndex < this.choices.length) {
+        this.displayChoice(this.choiceIndex, this.choices[this.choiceIndex])
+        this.choiceIndex++;
+      }
+      // Otherwise just wait until a choice is made.
+      else {
+        setTimeout(this.run.bind(this), 100);
+      }
     }
+
+    else if (this.events.length > 0) {
+      let e: string[] = this.events.shift();
+
+      if (e[0] == "message") {
+        this.displayMessage(e[1]);
+      }
+
+      else if (e[0] == "choice") {
+        this.startChoice(e.slice(1));
+        setTimeout(this.run.bind(this), 1);
+      }
+    }
+
     else {
       // Increment day count.
       this.day += 1;
@@ -88,14 +121,33 @@ class Game {
     }
   }
 
-  // Add a message to the queue.
-  queueMessage(message: string) {
-    this.messages.push(message);
+  startChoice(choices: string[]) {
+    this.choiceFlag = true;
+    this.choiceIndex = 0;
+    this.choices = choices;
   }
 
-  displayMessage(message: string)
-  {
+  // Add a message to the queue.
+  queueMessage(message: string) {
+    this.events.push(["message", message]);
+  }
+
+  // Add a choice to the choice queue.
+  queueChoice(choice: string[]) {
+    this.events.push(["choice"].concat(choice));
+  }
+
+  displayMessage(message: string) {
     // Fade the message in. Trigger the run method again once the fade in has completed.
-    $(`<p>${message}</p>`).appendTo("#GameMainScreen").hide().fadeIn(1000, this.run.bind(this));
+    $(`<p>${message}</p>`).appendTo("#GameMainScreen")
+    .hide().fadeIn(1000, this.run.bind(this));
+  }
+
+  displayChoice(index: number, choice: string) {
+    console.log(`Displaying choice ${index}.`);
+
+    // Fade the choice in. Trigger the run method again once the fade in has completed.
+    $(`<p class='clickable' onclick='game.makeChoice(${index})'>${choice}</p>`).appendTo("#GameMainScreen")
+    .hide().fadeIn(500, this.run.bind(this));
   }
 }
