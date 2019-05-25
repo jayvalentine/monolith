@@ -2,7 +2,10 @@
 /// <reference path="./random.ts">
 
 interface TribeEvent {
-  triggers(tribe: Tribe, region: Region) : boolean;
+  readonly id : string;
+
+  triggers(tribe: Tribe, region: Region, progress: number) : boolean;
+  progress(tribe: Tribe, region: Region) : number;
 
   isChoice() : boolean;
   choices() : string[];
@@ -12,13 +15,19 @@ interface TribeEvent {
 }
 
 class EncounterEvent {
+  public static readonly id : string = "EncounterEvent";
+
   static newAttitude : Attitudes.Monolith;
 
-  static triggers(tribe: Tribe, region: Region) : boolean {
+  static triggers(tribe: Tribe, region: Region, progress: number) : boolean {
     if (tribe.attitudes.monolith != Attitudes.Monolith.Unencountered) return false;
 
     else if (region.hasMonolith) return true;
     return false;
+  }
+
+  static progress(tribe: Tribe, region: Region) : number {
+    return 0;
   }
 
   static isChoice() : boolean {
@@ -52,8 +61,14 @@ class EncounterEvent {
 }
 
 class MigrationEvent {
-  static triggers(tribe: Tribe, region: Region) {
+  public static readonly id : string = "MigrationEvent";
+
+  static triggers(tribe: Tribe, region: Region, progress: number) {
     return tribe.migrate();
+  }
+
+  static progress(tribe: Tribe, region: Region) : number {
+    return 0;
   }
 
   static isChoice() : boolean {

@@ -1,4 +1,5 @@
 /// <reference path="./random.ts">
+/// <reference path="./tribe_events.ts">
 
 // A tribe is a group of people with common traits.
 class Tribe {
@@ -6,11 +7,14 @@ class Tribe {
 
   private _migrationChance : number;
 
+  private _eventProgress : Object;
+
   public attitudes: Attitudes;
 
   constructor(population: number) {
     this._population = population;
     this._migrationChance = 0.000001;
+    this._eventProgress = {};
 
     this.attitudes = new Attitudes();
 
@@ -23,7 +27,26 @@ class Tribe {
 
   migrate() : boolean {
     return Random.chance(this._migrationChance);
-  } 
+  }
+
+  progress(e: TribeEvent) : number {
+    return this._eventProgress[e.id];
+  }
+
+  increaseProgress(e: TribeEvent, progress: number) {
+    // Default to starting from 0 if no progress is stored.
+    let currentProgress : number = 0;
+
+    // Get the progress from the map if it exists.
+    if (this._eventProgress.hasOwnProperty(e.id)) currentProgress = this._eventProgress[e.id];
+
+    // Set the new progress.
+    this._eventProgress[e.id] = currentProgress+progress;
+  }
+
+  resetProgress(e: TribeEvent) {
+    this._eventProgress[e.id] = 0;
+  }
 }
 
 class Attitudes {
