@@ -29,7 +29,5 @@ function startMainGame() {
   $("#GamePrologueScreen").hide();
   $("#GameMainScreen").show();
 
-  Global.game.reset();
-
   Global.game.start();
 }

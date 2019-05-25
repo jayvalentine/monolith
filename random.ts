@@ -1,0 +1,10 @@
+class Random {
+  static interval(min: number, max: number) : number {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  static choice<T>(array: T[]) : T {
+    const index = Random.interval(0, array.length - 1);
+    return array[index];
+  } 
+}
