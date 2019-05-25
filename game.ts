@@ -6,14 +6,18 @@ class Game {
 
   private regions: Region[]; 
 
+  private messages: string[];
+
   constructor() {
     this.day = 0;
     this.regions = [];
+    this.messages = [];
   }
 
   start() {
     this.day = 0;
     this.regions = [];
+    this.messages = [];
 
     // Generate a number of regions.
     const regionLimit : number = Random.interval(30, 50);
@@ -22,7 +26,7 @@ class Game {
     }
 
     // Initial game message.
-    this.displayMessage(
+    this.queueMessage(
       `You awaken in a cold void. A glistening blue-green marble hangs below you.
       You slowly become aware of the various sensors attached to you, reading
       magnetic fields, temperature, radiation, and more.
@@ -43,25 +47,44 @@ class Game {
       console.log(regionsCopy.length)
     }
 
-    this.displayMessage(
+    this.queueMessage(
       `As your sensors engage you become aware of ${landingSitesLimit} landing sites
       on the planet below.`
     );
 
     for (let r of landingSites) {
-      this.displayMessage(
+      this.queueMessage(
         `${r.typeString()} with ${r.foodString()} food,
         ${r.waterString()} water, and ${r.resourcesString()} resources.`
       );
     }
+
+    this.run();
+  }
+
+  run() {
+    // Check to see if any messages need displaying.
+    console.log(this.messages.length);
+    if (this.messages.length > 0) {
+      this.displayMessage(this.messages.shift());
+    }
+    else {
+      // Increment day count.
+      this.day += 1;
+
+      // Trigger again in 100ms.
+      setTimeout(this.run.bind(this), 100);
+    }
+  }
+
+  // Add a message to the queue.
+  queueMessage(message: string) {
+    this.messages.push(message);
   }
 
   displayMessage(message: string)
   {
-    let displayFunction = function () {
-      $("#GameMainScreen").append(`<p>${message}</p>`).hide().fadeIn(1000);
-    }
-
-    $.when(displayFunction()).done(function () {});
+    // Fade the message in. Trigger the run method again once the fade in has completed.
+    $(`<p>${message}</p>`).appendTo("#GameMainScreen").hide().fadeIn(1000, this.run.bind(this));
   }
 }
