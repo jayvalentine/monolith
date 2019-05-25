@@ -110,8 +110,8 @@ class DiscoverFireEvent {
   static triggers(tribe: Tribe, region: Region, progress: number) : boolean {
     if (tribe.hasTechnology("fire")) return false;
 
-    let c : number = 0.000001;
-    if (tribe.attitudes.monolith = Attitudes.Monolith.Curious) c = 0.000002;
+    let c : number = 0.00001;
+    if (tribe.attitudes.monolith = Attitudes.Monolith.Curious) c = 0.00002;
 
     return Random.progressiveChance(c, progress, 1000000);
   }
@@ -160,8 +160,85 @@ class DiscoverFireEvent {
   }
 }
 
+class TribeWorshipsMonolithEvent {
+  public static id : string = "TribeWorshipsMonolithEvent";
+
+  static triggers(tribe: Tribe, region: Region, progress: number) {
+    if (tribe.attitudes.monolith != Attitudes.Monolith.Superstitious) return false;
+    if (!region.hasMonolith) return false;
+
+    return Random.progressiveChance(0.001, progress, 1000);
+  }
+
+  static progress(tribe: Tribe, region: Region) : number {
+    return 0.1;
+  }
+
+  static isChoice() : boolean {
+    return true;
+  }
+
+  static choices() : string[] {
+    return [
+      "I am not their god.",
+      "I am their god, and I am good.",
+      "I am their god, and they should fear me."
+    ];
+  }
+
+  static choicePrompt() : string {
+    return `One of the nearby tribes has taken a great interest in you. Tribe members regularly visit you, bringing
+    small offerings and prostrating themselves at your base. It becomes obvious that this is a form of primitive worship.`;
+  }
+
+  static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+    return [
+      `The tribe is confused, but seems to accept the fact that you are not a supernatural being.`,
+      `The tribe rejoices, pleased to have your approval. The visits become more frequent.`,
+      `The tribe is terrified of you, and while they begin bringing larger offerings, it is clear that the reasons
+      for their reverance have changed.`
+    ];
+  }
+
+  static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {
+    return [
+      function () {
+        // 50% chance for tribe to become curious.
+        // 50% chance for tribe to migrate.
+        if (Random.chance(0.5)) {
+          tribe.attitudes.monolith = Attitudes.Monolith.Curious;
+        }
+        else {
+          let otherRegions = region.nearby();
+
+          let migrateRegion : Region = Random.choice(otherRegions);
+
+          region.removeTribe(tribe);
+          migrateRegion.addTribe(tribe);
+        }
+      },
+      function () {
+        // Tribe stays superstitious and migration chance reduces to 0.
+        tribe.attitudes.monolith = Attitudes.Monolith.Superstitious;
+        tribe.setMigrationChance(0);
+      },
+      function () {
+        // Tribe becomes fearful and migrates.
+        tribe.attitudes.monolith = Attitudes.Monolith.Fearful;
+        let otherRegions = region.nearby();
+
+        let migrateRegion : Region = Random.choice(otherRegions);
+
+        region.removeTribe(tribe);
+        migrateRegion.addTribe(tribe);
+      }
+    ];
+  }
+}
+
 let TribeEvents : TribeEvent[] = [
   EncounterEvent,
   MigrationEvent,
-  DiscoverFireEvent
+  DiscoverFireEvent,
+  TribeWorshipsMonolithEvent
 ]

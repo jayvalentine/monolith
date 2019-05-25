@@ -33,6 +33,10 @@ class Tribe {
     return Random.chance(this._migrationChance);
   }
 
+  setMigrationChance(c: number) {
+    this._migrationChance = c;
+  }
+
   progress(e: TribeEvent) : number {
     return this._eventProgress[e.id];
   }
