@@ -207,8 +207,8 @@ class Game {
       // Increment day count.
       this.day += 1;
 
-      // Trigger again in 10ms.
-      setTimeout(this.run.bind(this), 10);
+      // Trigger again in 50ms.
+      setTimeout(this.run.bind(this), 50);
     }
   }
 

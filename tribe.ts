@@ -9,12 +9,16 @@ class Tribe {
 
   private _eventProgress : Object;
 
+  private _technology : string[];
+
   public attitudes: Attitudes;
 
   constructor(population: number) {
     this._population = population;
     this._migrationChance = 0.000001;
     this._eventProgress = {};
+
+    this._technology = [];
 
     this.attitudes = new Attitudes();
 
@@ -46,6 +50,16 @@ class Tribe {
 
   resetProgress(e: TribeEvent) {
     this._eventProgress[e.id] = 0;
+  }
+
+  addTechnology(technology: string) {
+    if (technology in this._technology) return;
+    this._technology.push(technology);
+  }
+
+  hasTechnology(technology: string) : boolean {
+    if (technology in this._technology) return true;
+    else return false;
   }
 }
 

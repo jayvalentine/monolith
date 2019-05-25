@@ -108,15 +108,19 @@ class DiscoverFireEvent {
   public static readonly id : string = "DiscoverFireEvent";
 
   static triggers(tribe: Tribe, region: Region, progress: number) : boolean {
-    let c : number = 0.00001;
-    if (tribe.attitudes.monolith = Attitudes.Monolith.Curious) c = 0.00002;
+    if (tribe.hasTechnology("fire")) return false;
+
+    let c : number = 0.000001;
+    if (tribe.attitudes.monolith = Attitudes.Monolith.Curious) c = 0.000002;
 
     return Random.progressiveChance(c, progress, 1000000);
   }
 
   static progress(tribe: Tribe, region: Region) : number {
-    if (region.type() == Region.Type.Desert) return 2;
-    else return 1;
+    if (tribe.hasTechnology("fire")) return 0;
+
+    if (region.type() == Region.Type.Desert) return 0.002;
+    else return 0.001;
   }
 
   static isChoice() : boolean {
@@ -145,8 +149,13 @@ class DiscoverFireEvent {
 
   static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {
     return [
-      function () {console.log("A tribe has discovered fire, and become curious.")},
-      function () {console.log("A tribe has shunned fire, and become fearful.")}
+      function () {
+        tribe.addTechnology("fire");
+        tribe.attitudes.monolith = Attitudes.Monolith.Curious;
+      },
+      function () {
+        tribe.attitudes.monolith = Attitudes.Monolith.Fearful;
+      }
     ];
   }
 }
