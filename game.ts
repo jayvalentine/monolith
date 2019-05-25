@@ -1,4 +1,5 @@
 /// <reference path="./region.ts">
+/// <reference path="./region_events.ts">
 /// <reference path="./random.ts">
 /// <reference path="./tribe.ts">
 
@@ -8,11 +9,12 @@ class Game {
   private regions: Region[]; 
 
   private events: string[][];
+  private outcomes : (() => void)[][];
 
   private choiceFlag : Game.Choice;
   private choiceIndex : number;
   private choices : string[];
-  private outcomes : (() => void)[];
+  private choiceOutcomes : (() => void)[];
 
   constructor() {
     this.day = 0;
@@ -50,7 +52,8 @@ class Game {
       `You awaken in a cold void. A glistening blue-green marble hangs below you.
       You slowly become aware of the various sensors attached to you, reading
       magnetic fields, temperature, radiation, and more.
-      You observe Kepler 62-f slowly, and search for a landing site.`
+      You observe Kepler 62-f slowly, and search for a landing site.`,
+      function () {}
     )
 
     // Determine a number of landing sites.
@@ -69,7 +72,8 @@ class Game {
 
     this.queueMessage(
       `As your sensors engage you become aware of ${landingSitesLimit} landing sites
-      on the planet below.`
+      on the planet below.`,
+      function () {}
     );
 
     let landingSiteChoices : string[] = [];
@@ -82,7 +86,7 @@ class Game {
         It has ${r.population()} inhabitants, split into ${r.tribesCount()} tribe(s).`
       );
 
-      landingSiteOutcomes.push(function() {r.hasMonolith = true; console.log(`Monolith landed in ${r.typeString()}`);});
+      landingSiteOutcomes.push(function() {r.hasMonolith = true;});
     }
 
     this.queueChoice(landingSiteChoices, landingSiteOutcomes);
@@ -111,37 +115,56 @@ class Game {
 
     else if (this.choiceFlag == Game.Choice.Done) {
       console.log(`Choice made: ${this.choiceIndex}`);
-      this.outcomes[this.choiceIndex]();
-      this.outcomes = [];
+
+      this.choiceOutcomes[this.choiceIndex]();
+      this.choiceOutcomes = [];
       this.choiceFlag = Game.Choice.None;
+
+      setTimeout(this.run.bind(this), 1)
     }
 
     else if (this.events.length > 0) {
       let e: string[] = this.events.shift();
+      let o: (() => void)[] = this.outcomes.shift();
 
       if (e[0] == "message") {
+        // Display the message.
         this.displayMessage(e[1]);
+        
+        // Perform the outcome, even if it is nothing.
+        o[0]();
       }
 
       else if (e[0] == "choice") {
-        this.startChoice(e.slice(1));
+        this.startChoice(e.slice(1), o);
         setTimeout(this.run.bind(this), 1);
       }
     }
 
     else {
+      // See if any region events trigger.
+      for (let region of this.regions) {
+        for (let regionEvent of RegionEvents) {
+          // If this region event triggers on this region, queue a message.
+          if (regionEvent.triggers(region)) {
+            this.queueMessage(regionEvent.outcomeMessage(region), regionEvent.outcomeFunction(region));
+          }
+        }
+      }
+
       // Increment day count.
       this.day += 1;
 
       // Trigger again in 100ms.
-      setTimeout(this.run.bind(this), 100);
+      setTimeout(this.run.bind(this), 10);
     }
   }
 
-  startChoice(choices: string[]) {
+  startChoice(choices: string[], outcomes: (() => void)[]) {
     this.choiceFlag = Game.Choice.Started;
     this.choiceIndex = 0;
     this.choices = choices;
+    this.choiceOutcomes = outcomes;
   }
 
   makeChoice(choice: number) {
@@ -165,14 +188,15 @@ class Game {
   }
 
   // Add a message to the queue.
-  queueMessage(message: string) {
+  queueMessage(message: string, outcome: (() => void)) {
     this.events.push(["message", message]);
+    this.outcomes.push([outcome])
   }
 
   // Add a choice to the choice queue.
   queueChoice(choice: string[], outcomes: (() => void)[]) {
     this.events.push(["choice"].concat(choice));
-    this.outcomes = outcomes;
+    this.outcomes.push(outcomes);
   }
 
   displayMessage(message: string) {
