@@ -10,11 +10,13 @@ class Game {
 
   private events: string[][];
   private outcomes : (() => void)[][];
+  private outcomeMessages : string[][];
 
   private choiceFlag : Game.Choice;
   private choiceIndex : number;
   private choices : string[];
   private choiceOutcomes : (() => void)[];
+  private choiceOutcomeMessages : string[];
 
   constructor() {
     this.day = 0;
@@ -31,6 +33,7 @@ class Game {
     this.choiceFlag = Game.Choice.None;
     this.choices = [];
     this.outcomes = [];
+    this.outcomeMessages = [];
 
     // Generate a number of regions.
     const regionLimit : number = Random.interval(30, 50);
@@ -97,6 +100,7 @@ class Game {
 
     let landingSiteChoices : string[] = [];
     let landingSiteOutcomes : (() => void)[] = [];
+    let landingSiteOutcomeMessages : string[] = [];
 
     for (let r of landingSites) {
       landingSiteChoices.push(
@@ -106,9 +110,10 @@ class Game {
       );
 
       landingSiteOutcomes.push(function() {r.hasMonolith = true;});
+      landingSiteOutcomeMessages.push("");
     }
 
-    this.queueChoice(landingSiteChoices, landingSiteOutcomes);
+    this.queueChoice(landingSiteChoices, landingSiteOutcomeMessages, landingSiteOutcomes);
 
     this.run();
   }
@@ -137,14 +142,17 @@ class Game {
 
       this.choiceOutcomes[this.choiceIndex]();
       this.choiceOutcomes = [];
-      this.choiceFlag = Game.Choice.None;
 
-      setTimeout(this.run.bind(this), 1)
+      this.displayMessage(this.choiceOutcomeMessages[this.choiceIndex]);
+      this.choiceOutcomeMessages = [];
+
+      this.choiceFlag = Game.Choice.None;
     }
 
     else if (this.events.length > 0) {
       let e: string[] = this.events.shift();
       let o: (() => void)[] = this.outcomes.shift();
+      let m: string[] = this.outcomeMessages.shift();
 
       if (e[0] == "message") {
         // Perform the outcome, even if it is nothing.
@@ -155,7 +163,7 @@ class Game {
       }
 
       else if (e[0] == "choice") {
-        this.startChoice(e.slice(1), o);
+        this.startChoice(e.slice(1), m, o);
         setTimeout(this.run.bind(this), 1);
       }
     }
@@ -178,7 +186,9 @@ class Game {
               tribe.resetProgress(tribeEvent);
 
               if (tribeEvent.isChoice()) {
-                this.queueChoice(tribeEvent.outcomeMessages(tribe, region),
+                this.queueMessage(tribeEvent.choicePrompt(), function () {});
+                this.queueChoice(tribeEvent.choices(),
+                                 tribeEvent.outcomeMessages(tribe, region),
                                  tribeEvent.outcomeFunctions(tribe, region));
               }
               else {
@@ -202,11 +212,12 @@ class Game {
     }
   }
 
-  startChoice(choices: string[], outcomes: (() => void)[]) {
+  startChoice(choices: string[], outcomeMessages: string[], outcomes: (() => void)[]) {
     this.choiceFlag = Game.Choice.Started;
     this.choiceIndex = 0;
     this.choices = choices;
     this.choiceOutcomes = outcomes;
+    this.choiceOutcomeMessages = outcomeMessages;
   }
 
   makeChoice(choice: number) {
@@ -232,13 +243,15 @@ class Game {
   // Add a message to the queue.
   queueMessage(message: string, outcome: (() => void)) {
     this.events.push(["message", message]);
-    this.outcomes.push([outcome])
+    this.outcomes.push([outcome]);
+    this.outcomeMessages.push([""]);
   }
 
   // Add a choice to the choice queue.
-  queueChoice(choice: string[], outcomes: (() => void)[]) {
+  queueChoice(choice: string[], outcomeMessages: string[], outcomes: (() => void)[]) {
     this.events.push(["choice"].concat(choice));
     this.outcomes.push(outcomes);
+    this.outcomeMessages.push(outcomeMessages);
   }
 
   displayMessage(message: string) {

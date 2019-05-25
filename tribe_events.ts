@@ -8,6 +8,7 @@ interface TribeEvent {
   progress(tribe: Tribe, region: Region) : number;
 
   isChoice() : boolean;
+  choicePrompt() : string;
   choices() : string[];
 
   outcomeMessages(tribe: Tribe, region: Region) : string[];
@@ -36,6 +37,10 @@ class EncounterEvent {
 
   static choices() : string[] {
     return [];
+  }
+
+  static choicePrompt() : string {
+    return "";
   }
 
   static outcomeMessages(tribe: Tribe, region: Region) : string[] {
@@ -79,6 +84,10 @@ class MigrationEvent {
     return [];
   }
 
+  static choicePrompt() : string {
+    return "";
+  }
+
   static outcomeMessages(tribe: Tribe, region: Region) : string[] {
     return [""];
   }
@@ -116,9 +125,14 @@ class DiscoverFireEvent {
 
   static choices() : string[] {
     return [
-      "It is useful.",
-      "It is dangerous."
+      "Fire is useful.",
+      "Fire is dangerous."
     ];
+  }
+
+  static choicePrompt() : string {
+    return `While wandering on a hot, dry day, a tribe member notices food left in the wake of a wildfire.
+    Noticing that the food seems firmer and smells different, the tribesperson brings it back to show the others.`;
   }
 
   static outcomeMessages(tribe: Tribe, region: Region) : string[] {
