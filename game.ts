@@ -12,6 +12,7 @@ class Game {
   private choiceFlag : Game.Choice;
   private choiceIndex : number;
   private choices : string[];
+  private outcomes : (() => void)[];
 
   constructor() {
     this.day = 0;
@@ -27,6 +28,7 @@ class Game {
     this.events = [];
     this.choiceFlag = Game.Choice.None;
     this.choices = [];
+    this.outcomes = [];
 
     // Generate a number of regions.
     const regionLimit : number = Random.interval(30, 50);
@@ -71,6 +73,7 @@ class Game {
     );
 
     let landingSiteChoices : string[] = [];
+    let landingSiteOutcomes : (() => void)[] = [];
 
     for (let r of landingSites) {
       landingSiteChoices.push(
@@ -78,9 +81,11 @@ class Game {
         ${r.waterString()} water, and ${r.resourcesString()} resources.
         It has ${r.population()} inhabitants, split into ${r.tribesCount()} tribe(s).`
       );
+
+      landingSiteOutcomes.push(function() {r.hasMonolith = true; console.log(`Monolith landed in ${r.typeString()}`);});
     }
 
-    this.queueChoice(landingSiteChoices);
+    this.queueChoice(landingSiteChoices, landingSiteOutcomes);
 
     this.run();
   }
@@ -106,6 +111,8 @@ class Game {
 
     else if (this.choiceFlag == Game.Choice.Done) {
       console.log(`Choice made: ${this.choiceIndex}`);
+      this.outcomes[this.choiceIndex]();
+      this.outcomes = [];
       this.choiceFlag = Game.Choice.None;
     }
 
@@ -163,8 +170,9 @@ class Game {
   }
 
   // Add a choice to the choice queue.
-  queueChoice(choice: string[]) {
+  queueChoice(choice: string[], outcomes: (() => void)[]) {
     this.events.push(["choice"].concat(choice));
+    this.outcomes = outcomes;
   }
 
   displayMessage(message: string) {

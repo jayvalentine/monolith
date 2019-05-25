@@ -16,6 +16,8 @@ class Region {
 
   private _tribes: Tribe[];
 
+  public hasMonolith: boolean;
+
   // Given a level number, returns a string description.
   private levelString(level : number) : string {
     switch(level)
@@ -59,7 +61,15 @@ class Region {
 
   // Returns the string representation of the region's type.
   typeString() : string {
-    return Region.Type[this._type];
+    switch(this._type) {
+      case Region.Type.Desert: return "desert";
+      case Region.Type.Grassland: return "grassland";
+      case Region.Type.Hills: return "hilly";
+      case Region.Type.Mountains: return "mountainous";
+      case Region.Type.Tundra: return "tundra";
+      case Region.Type.Valley: return "valley";
+      case Region.Type.Rainforest: return "rainforest";
+    }
   }
 
   // Returns the food level of the region, with the type modifier.
