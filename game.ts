@@ -9,7 +9,7 @@ class Game {
 
   private events: string[][];
 
-  private choiceFlag : boolean;
+  private choiceFlag : Game.Choice;
   private choiceIndex : number;
   private choices : string[];
 
@@ -17,7 +17,7 @@ class Game {
     this.day = 0;
     this.regions = [];
     this.events = [];
-    this.choiceFlag = false;
+    this.choiceFlag = Game.Choice.None;
     this.choices = [];
   }
 
@@ -25,7 +25,7 @@ class Game {
     this.day = 0;
     this.regions = [];
     this.events = [];
-    this.choiceFlag = false;
+    this.choiceFlag = Game.Choice.None;
     this.choices = [];
 
     // Generate a number of regions.
@@ -87,7 +87,7 @@ class Game {
 
   run() {
     // Are we making a choice? If so, we give that priority over everything else.
-    if (this.choiceFlag == true) {
+    if (this.choiceFlag == Game.Choice.Started) {
       // Have we displayed all the choices yet? If not, display the next one.
       if (this.choiceIndex < this.choices.length) {
         this.displayChoice(this.choiceIndex, this.choices[this.choiceIndex])
@@ -95,8 +95,18 @@ class Game {
       }
       // Otherwise just wait until a choice is made.
       else {
-        setTimeout(this.run.bind(this), 100);
+        this.choiceFlag = Game.Choice.Waiting;
+        setTimeout(this.run.bind(this), 1);
       }
+    }
+
+    else if (this.choiceFlag == Game.Choice.Waiting) {
+      setTimeout(this.run.bind(this), 10);
+    }
+
+    else if (this.choiceFlag == Game.Choice.Done) {
+      console.log(`Choice made: ${this.choiceIndex}`);
+      this.choiceFlag = Game.Choice.None;
     }
 
     else if (this.events.length > 0) {
@@ -122,9 +132,29 @@ class Game {
   }
 
   startChoice(choices: string[]) {
-    this.choiceFlag = true;
+    this.choiceFlag = Game.Choice.Started;
     this.choiceIndex = 0;
     this.choices = choices;
+  }
+
+  makeChoice(choice: number) {
+    // Return if we're still displaying the choices.
+    if (this.choiceFlag != Game.Choice.Waiting) return;
+
+    // Remove all choices except the one selected.
+    for (let i = 0; i < this.choiceIndex; i++) {
+      if (i != choice) {
+        console.log(`Deleting choice ${i} from the DOM.`);
+        $(`#choice-${i}`).remove();
+      }
+      else {
+        $(`#choice-${i}`).removeClass('clickable');
+        $(`#choice-${i}`).addClass('choice');
+      }
+    }
+
+    this.choiceIndex = choice;
+    this.choiceFlag = Game.Choice.Done;
   }
 
   // Add a message to the queue.
@@ -147,7 +177,17 @@ class Game {
     console.log(`Displaying choice ${index}.`);
 
     // Fade the choice in. Trigger the run method again once the fade in has completed.
-    $(`<p class='clickable' onclick='game.makeChoice(${index})'>${choice}</p>`).appendTo("#GameMainScreen")
+    $(`<p id='choice-${index}' class='clickable' onclick='Global.game.makeChoice(${index})'>${choice}</p>`)
+    .appendTo("#GameMainScreen")
     .hide().fadeIn(500, this.run.bind(this));
+  }
+}
+
+namespace Game {
+  export enum Choice {
+    None,
+    Waiting,
+    Started,
+    Done
   }
 }
