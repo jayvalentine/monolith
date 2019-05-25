@@ -42,10 +42,26 @@ class Game {
       regionsCopy = regionsCopy.filter(function (value, index, array) {return value != r});
       console.log(regionsCopy.length)
     }
+
+    this.displayMessage(
+      `As your sensors engage you become aware of ${landingSitesLimit} landing sites
+      on the planet below.`
+    );
+
+    for (let r of landingSites) {
+      this.displayMessage(
+        `${r.typeString()} with ${r.foodString()} food,
+        ${r.waterString()} water, and ${r.resourcesString()} resources.`
+      );
+    }
   }
 
   displayMessage(message: string)
   {
-    $("#GameMainScreen").append(`<p>${message}</p>`).hide().fadeIn(1000);
+    let displayFunction = function () {
+      $("#GameMainScreen").append(`<p>${message}</p>`).hide().fadeIn(1000);
+    }
+
+    $.when(displayFunction()).done(function () {});
   }
 }

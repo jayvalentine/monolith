@@ -13,6 +13,20 @@ class Region {
 
   private _type: Region.Type;
 
+  // Given a level number, returns a string description.
+  private levelString(level : number) : string {
+    switch(level)
+    {
+      case 0: return "no";
+      case 1: return "scarce";
+      case 2: return "barely adequate";
+      case 3: return "adequate";
+      case 4: return "sufficient";
+      case 5: return "plentiful";
+      case 6: return "abundant";
+    }
+  }
+
   constructor() {
     // Choose a random type for the region.
     let t = Random.interval(0, 6);
@@ -56,6 +70,11 @@ class Region {
     }
   }
 
+  // Returns a string representation of the region's food level.
+  foodString() : string {
+    return this.levelString(this.food());
+  }
+
   // Returns the water level of the region, with the type modifier.
   water() : number {
     switch(this._type) {
@@ -69,6 +88,11 @@ class Region {
     }
   }
 
+  // Returns a string representation of the region's water level.
+  waterString() : string {
+    return this.levelString(this.water());
+  }
+
   // Returns the resource level of the region, with the type modifier.
   resources() : number {
     switch(this._type) {
@@ -80,6 +104,11 @@ class Region {
       case Region.Type.Valley: return this._resources - 1;
       case Region.Type.Rainforest: return this._resources;
     }
+  }
+
+  // Returns a string representation of the region's resources level.
+  resourcesString() : string {
+    return this.levelString(this.resources());
   }
 }
 
