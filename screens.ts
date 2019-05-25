@@ -2,6 +2,7 @@
 
 function startPrologue() {
   $("#GameStartScreen").hide();
+  $("#GameMainScreen").hide();
 
   $("#PrologueTitle").hide();
   $("#Prologue1").hide();
@@ -27,6 +28,7 @@ function startPrologue() {
 
 function startMainGame() {
   $("#GamePrologueScreen").hide();
+  $("#GameStartScreen").hide();
   $("#GameMainScreen").show();
 
   Global.game.start();
