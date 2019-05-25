@@ -1,4 +1,5 @@
 /// <reference path="./random.ts">
+/// <reference path="./tribe.ts">
 
 // A region is a part of the world that can be inhabited by tribes.
 //
@@ -12,6 +13,8 @@ class Region {
   private _resources: number;
 
   private _type: Region.Type;
+
+  private _tribes: Tribe[];
 
   // Given a level number, returns a string description.
   private levelString(level : number) : string {
@@ -28,6 +31,8 @@ class Region {
   }
 
   constructor() {
+    this._tribes = [];
+
     // Choose a random type for the region.
     let t = Random.interval(0, 6);
     switch(t) {
@@ -109,6 +114,36 @@ class Region {
   // Returns a string representation of the region's resources level.
   resourcesString() : string {
     return this.levelString(this.resources());
+  }
+
+  // Returns the number of tribes in this region.
+  tribesCount() : number {
+    return this._tribes.length;
+  }
+
+  // Returns the population of this region.
+  population() : number {
+    let sum : number = 0;
+
+    for (let t of this._tribes) {
+      sum += t.population();
+    }
+
+    return sum;
+  }
+
+  // Adds a tribe to this region.
+  addTribe(tribe: Tribe) {
+    this._tribes.push(tribe);
+  }
+
+  // Removes a tribe from this region.
+  removeTribe(tribe: Tribe) {
+    const index = this._tribes.indexOf(tribe);
+
+    if (index >= 0) {
+      this._tribes.splice(index, 1);
+    }
   }
 }
 

@@ -1,5 +1,6 @@
 /// <reference path="./region.ts">
 /// <reference path="./random.ts">
+/// <reference path="./tribe.ts">
 
 class Game {
   private day: number;
@@ -22,7 +23,16 @@ class Game {
     // Generate a number of regions.
     const regionLimit : number = Random.interval(30, 50);
     for (let i = 0; i < regionLimit; i++) {
-      this.regions.push(new Region());
+      // Create a new region.
+      let r : Region = new Region();
+
+      // Add as many tribes as there are food in the region.
+      for (let f = 0; f < r.food(); f++) {
+        let t : Tribe = new Tribe(Random.interval(30, 90));
+        r.addTribe(t);
+      }
+
+      this.regions.push(r);
     }
 
     // Initial game message.
@@ -55,7 +65,8 @@ class Game {
     for (let r of landingSites) {
       this.queueMessage(
         `${r.typeString()} with ${r.foodString()} food,
-        ${r.waterString()} water, and ${r.resourcesString()} resources.`
+        ${r.waterString()} water, and ${r.resourcesString()} resources.
+        It has ${r.population()} inhabitants, split into ${r.tribesCount()} tribe(s).`
       );
     }
 
