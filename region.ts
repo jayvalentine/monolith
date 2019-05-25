@@ -131,6 +131,11 @@ class Region {
     return this._tribes.length;
   }
 
+  // Returns a list of tribes in this region.
+  tribes() : Tribe[] {
+    return this._tribes;
+  }
+
   // Returns the population of this region.
   population() : number {
     let sum : number = 0;

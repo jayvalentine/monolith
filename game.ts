@@ -128,11 +128,11 @@ class Game {
       let o: (() => void)[] = this.outcomes.shift();
 
       if (e[0] == "message") {
-        // Display the message.
-        this.displayMessage(e[1]);
-        
         // Perform the outcome, even if it is nothing.
         o[0]();
+
+        // Display the message.
+        this.displayMessage(e[1]);
       }
 
       else if (e[0] == "choice") {
@@ -148,6 +148,22 @@ class Game {
           // If this region event triggers on this region, queue a message.
           if (regionEvent.triggers(region)) {
             this.queueMessage(regionEvent.outcomeMessage(region), regionEvent.outcomeFunction(region));
+          }
+        }
+
+        for (let tribe of region.tribes()) {
+          for (let tribeEvent of TribeEvents) {
+            // If this tribe event triggers on this tribe, queue a message or a choice.
+            if (tribeEvent.triggers(tribe, region)) {
+              if (tribeEvent.isChoice()) {
+
+              }
+              else {
+                // If the event is not a choice, we can safely assume it has exactly one outcome.
+                this.queueMessage(tribeEvent.outcomeMessages(tribe, region)[0],
+                                  tribeEvent.outcomeFunctions(tribe, region)[0]);
+              }
+            }
           }
         }
       }
