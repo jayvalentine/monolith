@@ -241,6 +241,12 @@ class Game {
   }
 
   displayMessage(message: string) {
+    // Do nothing but trigger the run method if the message is empty.
+    if (message.length == 0) {
+      setTimeout(this.run.bind(this), 1);
+      return;
+    }
+
     // Fade the message in. Trigger the run method again once the fade in has completed.
     $(`<p>${message}</p>`).appendTo("#GameMainScreen")
     .hide().fadeIn(1000, this.run.bind(this));

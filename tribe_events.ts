@@ -65,12 +65,7 @@ class MigrationEvent {
   }
 
   static outcomeMessages(tribe: Tribe, region: Region) : string[] {
-    let tribeTitle : string = "A tribe";
-    if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) {
-      tribeTitle = "An unencountered tribe";
-    }
-
-    return [`${tribeTitle} has migrated.`];
+    return [""];
   }
 
   static outcomeFunctions(tribe: Tribe, region: Region) {
