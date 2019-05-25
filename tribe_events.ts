@@ -15,7 +15,7 @@ class EncounterEvent {
   static newAttitude : Attitudes.Monolith;
 
   static triggers(tribe: Tribe, region: Region) : boolean {
-    if (tribe.attitudes.monolith != Attitudes.Monolith.Untouched) return false;
+    if (tribe.attitudes.monolith != Attitudes.Monolith.Unencountered) return false;
 
     else if (region.hasMonolith) return true;
     return false;
@@ -51,6 +51,41 @@ class EncounterEvent {
   }
 }
 
+class MigrationEvent {
+  static triggers(tribe: Tribe, region: Region) {
+    return tribe.migrate();
+  }
+
+  static isChoice() : boolean {
+    return false;
+  }
+
+  static choices() : string[] {
+    return [];
+  }
+
+  static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+    let tribeTitle : string = "A tribe";
+    if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) {
+      tribeTitle = "An unencountered tribe";
+    }
+
+    return [`${tribeTitle} has migrated.`];
+  }
+
+  static outcomeFunctions(tribe: Tribe, region: Region) {
+    return [function () {
+      let otherRegions = region.nearby();
+
+      let migrateRegion : Region = Random.choice(otherRegions);
+
+      region.removeTribe(tribe);
+      migrateRegion.addTribe(tribe);
+    }];
+  }
+}
+
 let TribeEvents : TribeEvent[] = [
   EncounterEvent,
+  MigrationEvent,
 ]

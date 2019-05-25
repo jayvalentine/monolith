@@ -47,6 +47,25 @@ class Game {
       this.regions.push(r);
     }
 
+    // Generate a number of neighbours for each region.
+    for (let region of this.regions) {
+      // Get the list of other regions (i.e. filter this one out of the full list).
+      let otherRegions = this.regions.filter(function (value, index, array) {return value != region});
+
+      // 1-4 neighbours for each region.
+      const numNearby : number = Random.interval(1, 4);
+      for (let i = 0; i < numNearby; i++) {
+        // Pick another region from the list.
+        let other = Random.choice(otherRegions);
+
+        // Set these two regions as neighbours.
+        region.addNearbyRegion(other);
+
+        // Exclude the region we've just picked from further selection.
+        otherRegions = otherRegions.filter(function (value, index, array) {return value != other});
+      }
+    }
+
     // Initial game message.
     this.queueMessage(
       `You awaken in a cold void. A glistening blue-green marble hangs below you.
@@ -152,6 +171,8 @@ class Game {
         }
 
         for (let tribe of region.tribes()) {
+          let triggered : boolean = false;
+
           for (let tribeEvent of TribeEvents) {
             // If this tribe event triggers on this tribe, queue a message or a choice.
             if (tribeEvent.triggers(tribe, region)) {
@@ -163,6 +184,10 @@ class Game {
                 this.queueMessage(tribeEvent.outcomeMessages(tribe, region)[0],
                                   tribeEvent.outcomeFunctions(tribe, region)[0]);
               }
+
+              // Break if we've triggered an event for this tribe.
+              break;
+              triggered = true;
             }
           }
         }

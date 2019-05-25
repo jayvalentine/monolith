@@ -16,6 +16,8 @@ class Region {
 
   private _tribes: Tribe[];
 
+  private _nearbyRegions: Region[];
+
   public hasMonolith: boolean;
 
   // Given a level number, returns a string description.
@@ -34,6 +36,7 @@ class Region {
 
   constructor() {
     this._tribes = [];
+    this._nearbyRegions = [];
 
     // Choose a random type for the region.
     let t = Random.interval(0, 6);
@@ -153,12 +156,28 @@ class Region {
   }
 
   // Removes a tribe from this region.
+  // Exits silently if the tribe isn't in the region.
   removeTribe(tribe: Tribe) {
     const index = this._tribes.indexOf(tribe);
 
     if (index >= 0) {
       this._tribes.splice(index, 1);
     }
+  }
+
+  addNearbyRegion(region: Region) {
+    // Do nothing if we've already added this region.
+    if (this._nearbyRegions.indexOf(region) > -1) return;
+
+    // Add the other region.
+    this._nearbyRegions.push(region);
+
+    // Call addNearbyRegion for the other region, passing this.
+    region.addNearbyRegion(this);
+  }
+
+  nearby() : Region[] {
+    return this._nearbyRegions;
   }
 }
 

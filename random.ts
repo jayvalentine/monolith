@@ -6,5 +6,10 @@ class Random {
   static choice<T>(array: T[]) : T {
     const index = Random.interval(0, array.length - 1);
     return array[index];
-  } 
+  }
+
+  static chance(c: number) : boolean {
+    if (Math.random() < c) return true;
+    else return false;
+  }
 }
