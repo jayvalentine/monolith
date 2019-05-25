@@ -178,7 +178,8 @@ class Game {
               tribe.resetProgress(tribeEvent);
 
               if (tribeEvent.isChoice()) {
-
+                this.queueChoice(tribeEvent.outcomeMessages(tribe, region),
+                                 tribeEvent.outcomeFunctions(tribe, region));
               }
               else {
                 // If the event is not a choice, we can safely assume it has exactly one outcome.

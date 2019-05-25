@@ -12,4 +12,11 @@ class Random {
     if (Math.random() < c) return true;
     else return false;
   }
+
+  static progressiveChance(c: number, progress: number, factor: number) : boolean {
+    const limit = (progress/factor)+c;
+  
+    if (Math.random() < limit) return true;
+    else return false;
+  }
 }

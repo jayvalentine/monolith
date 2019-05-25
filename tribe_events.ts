@@ -95,7 +95,50 @@ class MigrationEvent {
   }
 }
 
+class DiscoverFireEvent {
+  public static readonly id : string = "DiscoverFireEvent";
+
+  static triggers(tribe: Tribe, region: Region, progress: number) : boolean {
+    let c : number = 0.00001;
+    if (tribe.attitudes.monolith = Attitudes.Monolith.Curious) c = 0.00002;
+
+    return Random.progressiveChance(c, progress, 1000000);
+  }
+
+  static progress(tribe: Tribe, region: Region) : number {
+    if (region.type() == Region.Type.Desert) return 2;
+    else return 1;
+  }
+
+  static isChoice() : boolean {
+    return true;
+  }
+
+  static choices() : string[] {
+    return [
+      "It is useful.",
+      "It is dangerous."
+    ];
+  }
+
+  static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+    return [
+      `The tribe is curious about the possible uses of this phenomenon. Some begin using it to cook their food,
+      while others use it to provide light at night.`,
+      `The tribe is afraid of this phenomenon. They avoid it, not understanding the benefits it could bring.`
+    ];
+  }
+
+  static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {
+    return [
+      function () {console.log("A tribe has discovered fire, and become curious.")},
+      function () {console.log("A tribe has shunned fire, and become fearful.")}
+    ];
+  }
+}
+
 let TribeEvents : TribeEvent[] = [
   EncounterEvent,
   MigrationEvent,
+  DiscoverFireEvent
 ]
