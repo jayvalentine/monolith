@@ -16,3 +16,11 @@ h3 {
 img {
   filter: brightness(150%);
 }
+
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover {
+  color: #33ccff;
+}
