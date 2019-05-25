@@ -1,3 +1,5 @@
+/// <reference path="./global">
+
 function startPrologue() {
   $("#GameStartScreen").hide();
 
@@ -26,4 +28,8 @@ function startPrologue() {
 function startMainGame() {
   $("#GamePrologueScreen").hide();
   $("#GameMainScreen").show();
+
+  Global.game.reset();
+
+  Global.game.start();
 }
