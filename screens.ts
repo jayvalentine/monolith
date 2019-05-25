@@ -6,6 +6,7 @@ function startPrologue() {
   $("#Prologue2").hide();
   $("#Prologue3").hide();
   $("#Prologue4").hide();
+  $("#PrologueContinue").hide();
 
   $("#GamePrologueScreen").show();
 
@@ -13,9 +14,16 @@ function startPrologue() {
     $("#Prologue1").fadeIn(4000, function () {
       $("#Prologue2").fadeIn(4000, function () {
         $("#Prologue3").fadeIn(4000, function () {
-          $("#Prologue4").fadeIn(8000);
+          $("#Prologue4").fadeIn(8000, function () {
+            $("#PrologueContinue").fadeIn(2000);
+          });
         });
       });
     });
   });
+}
+
+function startMainGame() {
+  $("#GamePrologueScreen").hide();
+  $("#GameMainScreen").show();
 }
