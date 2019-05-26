@@ -108,19 +108,20 @@ class DiscoverFireEvent {
   public static readonly id : string = "DiscoverFireEvent";
 
   static triggers(tribe: Tribe, region: Region, progress: number) : boolean {
+    if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return false;
     if (tribe.hasTechnology("fire")) return false;
 
-    let c : number = 0.00001;
-    if (tribe.attitudes.monolith = Attitudes.Monolith.Curious) c = 0.00002;
+    let c : number = 0.0001;
+    if (tribe.attitudes.monolith = Attitudes.Monolith.Curious) c = 0.0002;
 
-    return Random.progressiveChance(c, progress, 1000000);
+    return Random.progressiveChance(c, progress, 100000);
   }
 
   static progress(tribe: Tribe, region: Region) : number {
     if (tribe.hasTechnology("fire")) return 0;
 
-    if (region.type() == Region.Type.Desert) return 0.002;
-    else return 0.001;
+    if (region.type() == Region.Type.Desert) return 0.02;
+    else return 0.01;
   }
 
   static isChoice() : boolean {
