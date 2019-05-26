@@ -18,7 +18,7 @@ interface TribeEvent {
 class EncounterEvent {
   public static readonly id : string = "EncounterEvent";
 
-  static newAttitude : Attitudes.Monolith;
+  private static newAttitude : Attitudes.Monolith;
 
   static triggers(tribe: Tribe, region: Region, progress: number) : boolean {
     if (tribe.attitudes.monolith != Attitudes.Monolith.Unencountered) return false;
@@ -60,7 +60,68 @@ class EncounterEvent {
 
     return [function () {
       tribe.attitudes.monolith = attitude;
-      console.log(`Set tribe attitude to ${Attitudes.MonolithString(attitude)}`);
+      console.log(`Direct encounter: set tribe attitude to ${Attitudes.MonolithString(attitude)}`);
+    }];
+  }
+}
+
+class IndirectEncounterEvent {
+  public static readonly id : string = "IndirectEncounterEvent";
+
+  private static otherTribe : Tribe;
+
+  static triggers(tribe: Tribe, region: Region, progress: number) : boolean {
+    if (tribe.attitudes.monolith != Attitudes.Monolith.Unencountered) return false;
+
+    // Get any other encountered tribes in the region.
+    let otherTribes : Tribe[] = region.tribes().filter(
+      function (value, index, array) {
+        return (value != tribe) && (value.attitudes.monolith != Attitudes.Monolith.Unencountered);
+      });
+
+    if (otherTribes.length > 0) return true;
+    else return false;
+  }
+
+  static progress(tribe: Tribe, region: Region) : number {
+    return 0;
+  }
+
+  static isChoice() : boolean {
+    return false;
+  }
+
+  static choices() : string[] {
+    return [];
+  }
+
+  static choicePrompt() : string {
+    return "";
+  }
+
+  static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+    // Get any tribes in the region that have been encountered.
+    let otherTribes : Tribe[] = region.tribes().filter(
+      function (value, index, array) {
+        return (value != tribe) && (value.attitudes.monolith != Attitudes.Monolith.Unencountered);
+      }
+    );
+
+    // Choose one at random.
+    IndirectEncounterEvent.otherTribe = Random.choice(otherTribes);
+
+    let attitude : string = Attitudes.MonolithString(IndirectEncounterEvent.otherTribe.attitudes.monolith);
+
+    return [`A tribe you are familiar with has encountered a new tribe of ${tribe.population()} people.
+    After hearing of you, they seem ${attitude}.`];
+  }
+
+  static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {
+    const attitude : Attitudes.Monolith = IndirectEncounterEvent.otherTribe.attitudes.monolith;
+
+    return [function () {
+      tribe.attitudes.monolith = attitude;
+      console.log(`Indirect encounter: set tribe attitude to ${Attitudes.MonolithString(attitude)}`);
     }];
   }
 }
@@ -100,6 +161,10 @@ class MigrationEvent {
 
       region.removeTribe(tribe);
       migrateRegion.addTribe(tribe);
+
+      let attitude : string = Attitudes.MonolithString(tribe.attitudes.monolith);
+
+      console.log(`A ${attitude} tribe has migrated from ${region.typeString()} to ${migrateRegion.typeString()}.`)
     }];
   }
 }
@@ -111,8 +176,8 @@ class DiscoverFireEvent {
     if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return false;
     if (tribe.hasTechnology("fire")) return false;
 
-    let c : number = 0.0001;
-    if (tribe.attitudes.monolith = Attitudes.Monolith.Curious) c = 0.0002;
+    let c : number = 0.000001;
+    if (tribe.attitudes.monolith == Attitudes.Monolith.Curious) c = 0.000002;
 
     return Random.progressiveChance(c, progress, 100000);
   }
@@ -120,8 +185,8 @@ class DiscoverFireEvent {
   static progress(tribe: Tribe, region: Region) : number {
     if (tribe.hasTechnology("fire")) return 0;
 
-    if (region.type() == Region.Type.Desert) return 0.02;
-    else return 0.01;
+    if (region.type() == Region.Type.Desert) return 0.002;
+    else return 0.001;
   }
 
   static isChoice() : boolean {
@@ -153,9 +218,11 @@ class DiscoverFireEvent {
       function () {
         tribe.addTechnology("fire");
         tribe.attitudes.monolith = Attitudes.Monolith.Curious;
+        console.log(`A tribe has discovered fire.`);
       },
       function () {
         tribe.attitudes.monolith = Attitudes.Monolith.Fearful;
+        console.log(`A tribe has shunned fire.`);
       }
     ];
   }
@@ -239,7 +306,8 @@ class TribeWorshipsMonolithEvent {
 
 let TribeEvents : TribeEvent[] = [
   EncounterEvent,
+  IndirectEncounterEvent,
+  TribeWorshipsMonolithEvent,
   MigrationEvent,
   DiscoverFireEvent,
-  TribeWorshipsMonolithEvent
 ]

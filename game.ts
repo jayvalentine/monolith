@@ -179,9 +179,11 @@ class Game {
         }
 
         for (let tribe of region.tribes()) {
+          let triggered : boolean = false;
+
           for (let tribeEvent of TribeEvents) {
             // If this tribe event triggers on this tribe, queue a message or a choice.
-            if (tribeEvent.triggers(tribe, region, tribe.progress(tribeEvent))) {
+            if (!triggered && tribeEvent.triggers(tribe, region, tribe.progress(tribeEvent))) {
               // Reset progress towards the event.
               tribe.resetProgress(tribeEvent);
 
@@ -196,6 +198,8 @@ class Game {
                 this.queueMessage(tribeEvent.outcomeMessages(tribe, region)[0],
                                   tribeEvent.outcomeFunctions(tribe, region)[0]);
               }
+
+              triggered = true;
             }
             else {
               tribe.increaseProgress(tribeEvent, tribeEvent.progress(tribe, region));
@@ -208,7 +212,9 @@ class Game {
       this.day += 1;
 
       // Trigger again in 50ms.
-      setTimeout(this.run.bind(this), 50);
+      setTimeout(this.run.bind(this), 20);
+
+      console.log(`Game update: day ${this.day}`);
     }
   }
 
