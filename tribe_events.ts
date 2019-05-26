@@ -51,8 +51,9 @@ class EncounterEvent {
       case 2: EncounterEvent.newAttitude = Attitudes.Monolith.Fearful; break;
     }
 
-    return [`You encounter a tribe of ${tribe.population()} people. They seem ${Attitudes.MonolithString(EncounterEvent.newAttitude)}
-    towards you.`];
+    return [`You encounter a tribe of ${tribe.population()} people.
+    They are ${tribe.attitudes.othersString()}.
+    They seem ${Attitudes.MonolithString(EncounterEvent.newAttitude)} towards you.`];
   }
 
   static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {

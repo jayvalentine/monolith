@@ -25,6 +25,14 @@ class Tribe {
     this.attitudes = new Attitudes();
 
     this.attitudes.monolith = Attitudes.Monolith.Unencountered;
+
+    const othersRoll = Random.interval(0, 3);
+    switch (othersRoll) {
+      case 0: this.attitudes.others = Attitudes.Others.Aggressive; break;
+      case 1: this.attitudes.others = Attitudes.Others.Defensive; break;
+      case 2: this.attitudes.others = Attitudes.Others.Diplomatic; break;
+      case 3: this.attitudes.others = Attitudes.Others.Insular; break;
+    }
   }
 
   population() : number {
@@ -81,6 +89,7 @@ class Tribe {
 
 class Attitudes {
   public monolith: Attitudes.Monolith;
+  public others: Attitudes.Others;
 
   static MonolithString(monolith: Attitudes.Monolith) : string {
     switch(monolith) {
@@ -91,12 +100,25 @@ class Attitudes {
     }
   }
 
+  static OthersString(others: Attitudes.Others) : string {
+    switch(others) {
+      case Attitudes.Others.Aggressive: return "aggressive";
+      case Attitudes.Others.Defensive: return "defensive";
+      case Attitudes.Others.Diplomatic: return "diplomatic";
+      case Attitudes.Others.Insular: return "insular";
+    }
+  }
+
   constructor() {
 
   }
 
   monolithString() : string {
     return Attitudes.MonolithString(this.monolith);
+  }
+
+  othersString() : string {
+    return Attitudes.OthersString(this.others);
   }
 }
 
@@ -106,5 +128,12 @@ namespace Attitudes {
     Curious = "curious",
     Superstitious = "superstitious",
     Fearful = "fearful",
+  }
+
+  export enum Others {
+    Aggressive = "aggressive",
+    Defensive = "defensive",
+    Diplomatic = "diplomatic",
+    Insular = "insular",
   }
 }
