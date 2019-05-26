@@ -39,6 +39,26 @@ class Tribe {
     return this._population;
   }
 
+  reducePopulation(value: number) {
+    this._population -= value;
+  }
+
+  attack() : number {
+    let attack : number = 0;
+
+    if (this.attitudes.others == Attitudes.Others.Aggressive) attack += 1;
+
+    return attack;
+  }
+
+  defense() : number {
+    let defense : number = 0;
+
+    if (this.attitudes.others == Attitudes.Others.Defensive) defense += 1;
+
+    return defense;
+  }
+
   migrate() : boolean {
     return Random.chance(this._migrationChance);
   }

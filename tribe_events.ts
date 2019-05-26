@@ -127,6 +127,117 @@ class IndirectEncounterEvent {
   }
 }
 
+class AttackEvent {
+  public static readonly id : string = "AttackEvent";
+
+  private static outcome : number;
+  private static defender : Tribe;
+
+  static triggers(tribe: Tribe, region: Region, progress: number) : boolean {
+    if (tribe.attitudes.others != Attitudes.Others.Aggressive) return false;
+
+    // Are there any other tribes in this region?
+    let otherTribes : Tribe[] = region.tribes().filter(function (value, index, array) {return value != tribe});
+    if (otherTribes.length == 0) return false;
+
+    // Triggers with chance 0.0001.
+    return Random.chance(0.0001);
+  }
+
+  static progress(tribe: Tribe, region: Region) : number {
+    return 0;
+  }
+
+  static isChoice() : boolean {
+    return false;
+  }
+
+  static choices() : string[] {
+    return [];
+  }
+
+  static choicePrompt() : string {
+    return "";
+  }
+
+  static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+    let attacker : Tribe = tribe;
+
+    // Randomly select a defender.
+    let otherTribes = region.tribes().filter(function (value, index, array) {return value != tribe});
+    AttackEvent.defender = Random.choice(otherTribes);
+
+    const attackerRoll : number = Random.interval(1, 10) + attacker.attack();
+    const defenderRoll : number = Random.interval(1, 10) + AttackEvent.defender.defense();
+
+    AttackEvent.outcome = ((attackerRoll - defenderRoll) * 10) + Random.interval(-5, 5);
+  
+    // Silent message if none of the tribes involved have been encountered.
+    if ((attacker.attitudes.monolith != Attitudes.Monolith.Unencountered)
+        && (AttackEvent.defender.attitudes.monolith != Attitudes.Monolith.Unencountered)) {
+      return [""];
+    }
+
+    let outcomeMessage : string;
+    let lossesMessage: string = "";
+
+    if (AttackEvent.outcome > 0) {
+      let defenderLosses = Math.min(AttackEvent.defender.population(), AttackEvent.outcome);
+
+      outcomeMessage = `The attack was successful.`;
+
+      if (defenderLosses == AttackEvent.defender.population()) {
+        lossesMessage = `The defenders have been wiped out.`;
+      }
+      else {
+        lossesMessage = `The defenders have lost ${defenderLosses} people in the attack.`;
+      }
+    }
+    else if (AttackEvent.outcome < 0) {
+      let attackerLosses = Math.min(attacker.population(), -AttackEvent.outcome);
+
+      outcomeMessage = `The attack was repulsed.`;
+
+      if (attackerLosses == attacker.population()) {
+        lossesMessage = `The attackers have been wiped out.`;
+      }
+      else {
+        lossesMessage = `The attackers have lost ${attackerLosses} people in the attack.`;
+      }
+    }
+    else {
+      outcomeMessage = `The attack ended in a stalemate.`
+    }
+
+    return [`A tribe has attacked a neighbouring tribe.
+    ${outcomeMessage}
+    ${lossesMessage}`];
+  }
+
+  static outcomeFunctions(tribe: Tribe, region: Region) {
+    const defender : Tribe = AttackEvent.defender;
+    const outcome : number = AttackEvent.outcome;
+
+    if (outcome > 0) {
+      return [function () {
+        console.log(`attack: success (${outcome})`);
+        defender.reducePopulation(outcome)
+      }];
+    }
+    else if (outcome < 0) {
+      return [function () {
+        console.log(`attack: failure (${outcome})`);
+        tribe.reducePopulation(-outcome)
+      }];
+    }
+    else {
+      return [function () {
+        console.log("attack: stalemate");
+      }];
+    }
+  }
+}
+
 class MigrationEvent {
   public static readonly id : string = "MigrationEvent";
 
@@ -185,6 +296,7 @@ class DiscoverFireEvent {
 
   static progress(tribe: Tribe, region: Region) : number {
     if (tribe.hasTechnology("fire")) return 0;
+    if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return 0;
 
     if (region.type() == Region.Type.Desert) return 2;
     else return 1;
@@ -312,6 +424,7 @@ let TribeEvents : TribeEvent[] = [
   EncounterEvent,
   IndirectEncounterEvent,
   TribeWorshipsMonolithEvent,
+  AttackEvent,
   MigrationEvent,
   DiscoverFireEvent,
 ]
