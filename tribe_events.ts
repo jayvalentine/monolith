@@ -179,14 +179,14 @@ class DiscoverFireEvent {
     let c : number = 0.000001;
     if (tribe.attitudes.monolith == Attitudes.Monolith.Curious) c = 0.000002;
 
-    return Random.progressiveChance(c, progress, 100000);
+    return Random.progressiveChance(c, progress);
   }
 
   static progress(tribe: Tribe, region: Region) : number {
     if (tribe.hasTechnology("fire")) return 0;
 
-    if (region.type() == Region.Type.Desert) return 0.002;
-    else return 0.001;
+    if (region.type() == Region.Type.Desert) return 2;
+    else return 1;
   }
 
   static isChoice() : boolean {
@@ -235,11 +235,17 @@ class TribeWorshipsMonolithEvent {
     if (tribe.attitudes.monolith != Attitudes.Monolith.Superstitious) return false;
     if (!region.hasMonolith) return false;
 
-    return Random.progressiveChance(0.001, progress, 1000);
+    // This event does not trigger if the tribe already worships the monolith.
+    if (tribe.hasCulture("worshipsMonolith")) {
+      console.log("Not triggered because tribe already worships monolith.");
+      return false;
+    }
+
+    return Random.progressiveChance(0.00001, progress);
   }
 
   static progress(tribe: Tribe, region: Region) : number {
-    return 0.1;
+    return 1;
   }
 
   static isChoice() : boolean {
@@ -288,17 +294,14 @@ class TribeWorshipsMonolithEvent {
       function () {
         // Tribe stays superstitious and migration chance reduces to 0.
         tribe.attitudes.monolith = Attitudes.Monolith.Superstitious;
+        tribe.addCulture("worshipsMonolith");
         tribe.setMigrationChance(0);
       },
       function () {
-        // Tribe becomes fearful and migrates.
+        // Tribe becomes fearful.
         tribe.attitudes.monolith = Attitudes.Monolith.Fearful;
-        let otherRegions = region.nearby();
-
-        let migrateRegion : Region = Random.choice(otherRegions);
-
-        region.removeTribe(tribe);
-        migrateRegion.addTribe(tribe);
+        tribe.addCulture("worshipsMonolith");
+        tribe.addCulture("fearsMonolith");
       }
     ];
   }

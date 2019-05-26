@@ -10,6 +10,7 @@ class Tribe {
   private _eventProgress : Object;
 
   private _technology : string[];
+  private _culture : string[];
 
   public attitudes: Attitudes;
 
@@ -19,6 +20,7 @@ class Tribe {
     this._eventProgress = {};
 
     this._technology = [];
+    this._culture = [];
 
     this.attitudes = new Attitudes();
 
@@ -57,12 +59,22 @@ class Tribe {
   }
 
   addTechnology(technology: string) {
-    if (technology in this._technology) return;
+    if (this._technology.indexOf(technology) > -1) return;
     this._technology.push(technology);
   }
 
   hasTechnology(technology: string) : boolean {
-    if (technology in this._technology) return true;
+    if (this._technology.indexOf(technology) > -1) return true;
+    else return false;
+  }
+
+  addCulture(culture: string) {
+    if (this._culture.indexOf(culture) > -1) return;
+    this._culture.push(culture);
+  }
+
+  hasCulture(culture: string) : boolean {
+    if (this._culture.indexOf(culture) > -1) return true;
     else return false;
   }
 }
