@@ -430,6 +430,67 @@ class DiscoverToolsEvent {
   }
 }
 
+class DiscoverConstructionEvent {
+  public static readonly id : string = "DiscoverConstructionEvent";
+
+  static triggers(tribe: Tribe, region: Region, progress: number) : boolean {
+    // Can't trigger if:
+    // Tribe is unencountered
+    // Tribe doesn't have tools
+    // Tribe already has construction.
+    if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return false;
+    if (!tribe.hasTechnology("tools")) return false;
+    if (tribe.hasTechnology("construction")) return false;
+
+    let c : number = 0.000001;
+    if (tribe.attitudes.others == Attitudes.Others.Defensive) c = 0.000002;
+
+    return Random.progressiveChance(c, progress);
+  }
+
+  static progress(tribe: Tribe, region: Region) : number {
+    // Can't progress if:
+    // Tribe is unencountered
+    // Tribe doesn't have tools
+    // Tribe already has construction.
+    if (!tribe.hasTechnology("tools")) return 0;
+    if (tribe.hasTechnology("construction")) return 0;
+    if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return 0;
+
+    if (region.resources() > 0) return 1;
+    else return 0;
+  }
+
+  static isChoice() : boolean {
+    return false;
+  }
+
+  static choices() : string[] {
+    return [];
+  }
+
+  static choicePrompt() : string {
+    return "";
+  }
+
+  static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+    return [
+      `A tribe has begun using stone and wood, along with their tools, to construct
+      simple buildings in which to live and store food.`
+    ];
+  }
+
+  static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {
+    return [
+      function () {
+        tribe.addTechnology("construction");
+        tribe.setMigrationChance(0);
+        console.log(`A tribe has discovered construction.`);
+      }
+    ];
+  }
+}
+
 class TribeWorshipsMonolithEvent {
   public static id : string = "TribeWorshipsMonolithEvent";
 
@@ -518,4 +579,5 @@ let TribeEvents : TribeEvent[] = [
   MigrationEvent,
   DiscoverFireEvent,
   DiscoverToolsEvent,
+  DiscoverConstructionEvent,
 ]
