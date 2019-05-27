@@ -28,6 +28,7 @@ img {
 }
 
 .clickable {
+  color: #0099cc;
   cursor: pointer;
 }
 
