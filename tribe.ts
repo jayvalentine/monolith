@@ -88,6 +88,7 @@ class Tribe {
     let attack : number = 0;
 
     if (this.attitudes.others == Attitudes.Others.Aggressive) attack += 1;
+    if (this.hasTechnology("tools")) attack += 1;
 
     return attack;
   }
@@ -96,6 +97,7 @@ class Tribe {
     let defense : number = 0;
 
     if (this.attitudes.others == Attitudes.Others.Defensive) defense += 1;
+    if (this.hasTechnology("construction")) defense += 1;
 
     return defense;
   }
