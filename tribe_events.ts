@@ -334,11 +334,11 @@ class TribeWorshipsMonolithEvent {
       return false;
     }
 
-    return Random.progressiveChance(0.00001, progress, 0.01);
+    return Random.progressiveChance(0.0001, progress, 0.1);
   }
 
   static progress(tribe: Tribe, region: Region) : number {
-    return 1;
+    return Random.interval(0, 2);
   }
 
   static isChoice() : boolean {
@@ -395,6 +395,87 @@ class TribeWorshipsMonolithEvent {
         tribe.attitudes.monolith = Attitudes.Monolith.Fearful;
         tribe.addCulture("worshipsMonolith");
         tribe.addCulture("fearsMonolith");
+      }
+    ];
+  }
+}
+
+class TribeBuildsTempleEvent {
+  public static id : string = "TribeBuildsTempleEvent";
+
+  private static triggered : boolean = false;
+
+  static triggers(tribe: Tribe, region: Region, progress: number) {
+    // Does not trigger if:
+    // Tribe is not in same region as the monolith
+    // Tribe does not have the 'worships monolith' culture
+    // Tribe does not have construction
+    if (!region.hasMonolith) return false;
+    if (!tribe.hasCulture("worshipsMonolith")) return false;
+    if (!tribe.hasTechnology("construction")) return false;
+
+    // Only triggers once per game.
+    if (TribeBuildsTempleEvent.triggered) return false;
+
+    if (Random.progressiveChance(0.0001, progress, 0.1)) {
+      TribeBuildsTempleEvent.triggered = true;
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  static progress(tribe: Tribe, region: Region) : number {
+    if (!region.hasMonolith) return 0;
+    if (!tribe.hasCulture("worshipsMonolith")) return 0;
+    if (!tribe.hasTechnology("construction")) return 0;
+
+    if (TribeBuildsTempleEvent.triggered) return 0;
+
+    return 1;
+  }
+
+  static isChoice() : boolean {
+    return true;
+  }
+
+  static choices() : string[] {
+    return [
+      "I am not worthy of their worship.",
+      "They are right to revere me."
+    ];
+  }
+
+  static choicePrompt(tribe: Tribe) : string {
+    return `You notice that members of ${tribe.title()} have begun bringing construction equipment and materials to you.
+    Before long a handful of standing stones, obviously fashioned in your image, surrounds the rim of the crater where you
+    have landed.`;
+  }
+
+  static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+    return [
+      `The tribe is confused, as you had told them you were their god.
+      They are worried that building the temple has disturbed you,
+      and leave your landing site in peace, with the temple only half-finished.`,
+      `The tribe continues constructing the temple, celebrating once it is finished.`
+    ];
+  }
+
+  static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {
+    return [
+      function () {
+        region.addStructure("partialMonolithTemple");
+        let otherRegions = region.nearby();
+
+        let migrateRegion : Region = Random.choice(otherRegions);
+
+        region.removeTribe(tribe);
+        migrateRegion.addTribe(tribe);
+      },
+      function () {
+        tribe.addCulture("celebratesMonolith");
+        region.addStructure("monolithTemple");
       }
     ];
   }
@@ -492,6 +573,7 @@ let TribeEvents : TribeEvent[] = [
   EncounterEvent,
   IndirectEncounterEvent,
   TribeWorshipsMonolithEvent,
+  TribeBuildsTempleEvent,
   FireSpreadsEvent,
   AttackEvent,
   MigrationEvent,

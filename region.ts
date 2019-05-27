@@ -18,6 +18,8 @@ class Region {
 
   private _nearbyRegions: Region[];
 
+  private _structures: string[];
+
   public hasMonolith: boolean;
 
   // Given a level number, returns a string description.
@@ -37,6 +39,7 @@ class Region {
   constructor() {
     this._tribes = [];
     this._nearbyRegions = [];
+    this._structures = [];
 
     // Choose a random type for the region.
     let t = Random.interval(0, 6);
@@ -182,6 +185,16 @@ class Region {
 
   nearby() : Region[] {
     return this._nearbyRegions;
+  }
+
+  addStructure(structure: string) {
+    if (this._structures.indexOf(structure) > -1) return;
+    else this._structures.push(structure);
+  }
+
+  hasStructure(structure: string) : boolean {
+    if (this._structures.indexOf(structure) > -1) return true;
+    else return false;
   }
 }
 
