@@ -379,6 +379,57 @@ class DiscoverFireEvent {
   }
 }
 
+class DiscoverToolsEvent {
+  public static readonly id : string = "DiscoverToolsEvent";
+
+  static triggers(tribe: Tribe, region: Region, progress: number) : boolean {
+    if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return false;
+    if (tribe.hasTechnology("tools")) return false;
+
+    let c : number = 0.000001;
+    if (tribe.attitudes.monolith == Attitudes.Monolith.Curious) c = 0.000002;
+
+    return Random.progressiveChance(c, progress);
+  }
+
+  static progress(tribe: Tribe, region: Region) : number {
+    if (tribe.hasTechnology("tools")) return 0;
+    if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return 0;
+
+    if (region.resources() > 2) return 2;
+    else return 1;
+  }
+
+  static isChoice() : boolean {
+    return false;
+  }
+
+  static choices() : string[] {
+    return [];
+  }
+
+  static choicePrompt() : string {
+    return "";
+  }
+
+  static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+    return [
+      `A small group of tribespeople have developed simple stone tools to aid them in their daily lives.
+      They show the rest of their tribe, and the tools quickly catch on, with the tribe using them to enhance
+      their abilities.`
+    ];
+  }
+
+  static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {
+    return [
+      function () {
+        tribe.addTechnology("tools");
+        console.log(`A tribe has discovered tools.`);
+      }
+    ];
+  }
+}
+
 class TribeWorshipsMonolithEvent {
   public static id : string = "TribeWorshipsMonolithEvent";
 
@@ -466,4 +517,5 @@ let TribeEvents : TribeEvent[] = [
   AttackEvent,
   MigrationEvent,
   DiscoverFireEvent,
+  DiscoverToolsEvent,
 ]
