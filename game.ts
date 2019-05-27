@@ -178,6 +178,8 @@ class Game {
           }
         }
 
+        let tribesToRemove : Tribe[] = []
+
         for (let tribe of region.tribes()) {
           let triggered : boolean = false;
 
@@ -205,6 +207,14 @@ class Game {
               tribe.increaseProgress(tribeEvent, tribeEvent.progress(tribe, region));
             }
           }
+
+          // Add the tribe to the list of tribes to be removed if it is dead.
+          if (tribe.dead) tribesToRemove.push(tribe);
+        }
+
+        // Remove all the dead tribes.
+        for (let tribe of tribesToRemove) {
+          region.removeTribe(tribe);
         }
       }
 
@@ -213,8 +223,6 @@ class Game {
 
       // Trigger again in 50ms.
       setTimeout(this.run.bind(this), 20);
-
-      console.log(`Game update: day ${this.day}`);
     }
   }
 

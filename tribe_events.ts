@@ -127,6 +127,44 @@ class IndirectEncounterEvent {
   }
 }
 
+class TribeDestroyedEvent {
+  public static readonly id : string = "TribeDestroyedEvent";
+
+  static triggers(tribe: Tribe, region: Region, progress: number) : boolean {
+    if (tribe.population() <= 0) return true;
+    else return false;
+  }
+
+  static progress(tribe: Tribe, region: Region) : number {
+    return 0;
+  }
+
+  static isChoice() : boolean {
+    return false;
+  }
+
+  static choices() : string[] {
+    return [];
+  }
+
+  static choicePrompt() : string {
+    return "";
+  }
+
+  static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+    if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) {
+      return [""];
+    }
+    else {
+      return ["You sense a great loss. A tribe you have encountered is no more."];
+    }
+  }
+
+  static outcomeFunctions(tribe: Tribe, region: Region) {
+    return [function () {tribe.dead = true; console.log("A tribe has died.");}];
+  }
+}
+
 class AttackEvent {
   public static readonly id : string = "AttackEvent";
 
@@ -173,8 +211,8 @@ class AttackEvent {
     AttackEvent.outcome = ((attackerRoll - defenderRoll) * 10) + Random.interval(-5, 5);
   
     // Silent message if none of the tribes involved have been encountered.
-    if ((attacker.attitudes.monolith != Attitudes.Monolith.Unencountered)
-        && (AttackEvent.defender.attitudes.monolith != Attitudes.Monolith.Unencountered)) {
+    if ((attacker.attitudes.monolith == Attitudes.Monolith.Unencountered)
+        && (AttackEvent.defender.attitudes.monolith == Attitudes.Monolith.Unencountered)) {
       return [""];
     }
 
@@ -421,6 +459,7 @@ class TribeWorshipsMonolithEvent {
 }
 
 let TribeEvents : TribeEvent[] = [
+  TribeDestroyedEvent,
   EncounterEvent,
   IndirectEncounterEvent,
   TribeWorshipsMonolithEvent,

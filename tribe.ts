@@ -14,6 +14,8 @@ class Tribe {
 
   public attitudes: Attitudes;
 
+  public dead : boolean;
+
   constructor(population: number) {
     this._population = population;
     this._migrationChance = 0.000001;
@@ -25,6 +27,8 @@ class Tribe {
     this.attitudes = new Attitudes();
 
     this.attitudes.monolith = Attitudes.Monolith.Unencountered;
+
+    this.dead = false;
 
     const othersRoll = Random.interval(0, 3);
     switch (othersRoll) {
