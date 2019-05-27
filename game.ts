@@ -228,10 +228,6 @@ class Game {
 
       $("#GameDate").text(`Year ${Math.floor(this.day / 276)}, Day ${this.day % 276}`);
 
-      $('html, body').animate({
-        scrollTop: $("#GameDate").offset().top
-      }, 100);
-
       console.log(`Day ${this.day}`);
     }
   }
@@ -289,6 +285,9 @@ class Game {
     // Fade the message in. Trigger the run method again once the fade in has completed.
     $(`<p>${message}</p>`).insertBefore("#GameDate")
     .hide().fadeIn(1000, this.run.bind(this));
+
+    // Force scroll to the bottom of the screen.
+    $('html, body').scrollTop($("#GameDate").offset().top);
   }
 
   displayChoice(index: number, choice: string) {
@@ -298,6 +297,9 @@ class Game {
     $(`<p id='choice-${index}' class='clickable' onclick='Global.game.makeChoice(${index})'>${choice}</p>`)
     .insertBefore("#GameDate")
     .hide().fadeIn(500, this.run.bind(this));
+
+    // Force scroll to the bottom of the screen.
+    $('html, body').scrollTop($("#GameDate").offset().top);
   }
 }
 
