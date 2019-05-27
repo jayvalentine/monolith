@@ -43,8 +43,32 @@ class Tribe {
     return this._population;
   }
 
-  reducePopulation(value: number) {
+  decreasePopulation(value: number) {
     this._population -= value;
+  }
+
+  increasePopulation(value: number) {
+    this._population += value;
+  }
+
+  // Determines change in tribe's population.
+  grow() {
+    let growthCount : number = 0;
+    let deathCount : number = 0;
+
+    // Every two people in the tribe has a chance to produce offspring.
+    for (let i = 0; i < (Math.floor(this.population()/2)); i++) {
+      if (Random.chance(this.growthRate())) growthCount++;
+    }
+
+    // Every person in the tribe has a chance to die.
+    for (let i = 0; i < this.population(); i++) {
+      if (Random.chance(this.deathRate())) deathCount++;
+    }
+
+    // Increase population by growth count and decrease by death count.
+    this.increasePopulation(growthCount);
+    this.decreasePopulation(deathCount);
   }
 
   attack() : number {
@@ -108,6 +132,20 @@ class Tribe {
   hasCulture(culture: string) : boolean {
     if (this._culture.indexOf(culture) > -1) return true;
     else return false;
+  }
+
+  private growthRate() : number {
+    let g : number = 0.0001;
+
+    if (this.hasTechnology("fire")) g = 2 * g;
+
+    return g;
+  }
+
+  private deathRate() : number {
+    let d : number = 0.00005;
+
+    return d;
   }
 }
 

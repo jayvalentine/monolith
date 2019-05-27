@@ -259,13 +259,13 @@ class AttackEvent {
     if (outcome > 0) {
       return [function () {
         console.log(`attack: success (${outcome})`);
-        defender.reducePopulation(outcome)
+        defender.decreasePopulation(outcome)
       }];
     }
     else if (outcome < 0) {
       return [function () {
         console.log(`attack: failure (${outcome})`);
-        tribe.reducePopulation(-outcome)
+        tribe.decreasePopulation(-outcome)
       }];
     }
     else {

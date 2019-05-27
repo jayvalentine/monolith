@@ -209,7 +209,9 @@ class Game {
           }
 
           // Add the tribe to the list of tribes to be removed if it is dead.
+          // Otherwise process the tribe's growth.
           if (tribe.dead) tribesToRemove.push(tribe);
+          else tribe.grow();
         }
 
         // Remove all the dead tribes.
@@ -223,6 +225,8 @@ class Game {
 
       // Trigger again in 50ms.
       setTimeout(this.run.bind(this), 20);
+
+      console.log(`Day ${this.day}`);
     }
   }
 
