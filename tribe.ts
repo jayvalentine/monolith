@@ -12,6 +12,8 @@ class Tribe {
   private _technology : string[];
   private _culture : string[];
 
+  private _name : string;
+
   public attitudes: Attitudes;
 
   public dead : boolean;
@@ -23,6 +25,8 @@ class Tribe {
 
     this._technology = [];
     this._culture = [];
+
+    this._name = "";
 
     this.attitudes = new Attitudes();
 
@@ -53,22 +57,31 @@ class Tribe {
 
   // Determines change in tribe's population.
   grow() {
+    const oldPopulation = this.population();
+
     let growthCount : number = 0;
     let deathCount : number = 0;
 
+    const growthRate = this.growthRate();
+    const deathRate = this.deathRate();
+
     // Every two people in the tribe has a chance to produce offspring.
     for (let i = 0; i < (Math.floor(this.population()/2)); i++) {
-      if (Random.chance(this.growthRate())) growthCount++;
+      if (Random.chance(growthRate)) growthCount++;
     }
 
     // Every person in the tribe has a chance to die.
     for (let i = 0; i < this.population(); i++) {
-      if (Random.chance(this.deathRate())) deathCount++;
+      if (Random.chance(deathRate)) deathCount++;
     }
 
     // Increase population by growth count and decrease by death count.
     this.increasePopulation(growthCount);
     this.decreasePopulation(deathCount);
+
+    const difference = (this.population() - oldPopulation);
+    if (difference > 0) console.log(`A tribe has grown by ${difference}.`);
+    else if (difference < 0) console.log(`A tribe's population has decreased by ${-difference}.`);
   }
 
   attack() : number {
@@ -134,10 +147,19 @@ class Tribe {
     else return false;
   }
 
+  title() : string {
+    if (this._name == "") return "a tribe";
+    else return "the " + this._name;
+  }
+
+  setName(name: string) {
+    this._name = name;
+  }
+
   private growthRate() : number {
     let g : number = 0.0001;
 
-    if (this.hasTechnology("fire")) g = 2 * g;
+    if (this.hasTechnology("fire")) g = 10 * g;
 
     return g;
   }

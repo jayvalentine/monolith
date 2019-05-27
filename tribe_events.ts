@@ -260,6 +260,7 @@ class AttackEvent {
       return [function () {
         console.log(`attack: success (${outcome})`);
         defender.decreasePopulation(outcome)
+        tribe.increasePopulation(Math.floor(outcome/2));
       }];
     }
     else if (outcome < 0) {
@@ -491,6 +492,97 @@ class DiscoverConstructionEvent {
   }
 }
 
+class DiscoverLanguageEvent {
+  public static readonly id : string = "DiscoverLanguageEvent";
+
+  private static tribeName : string;
+
+  static triggers(tribe: Tribe, region: Region, progress: number) : boolean {
+    // Can't trigger if:
+    // Tribe is unencountered
+    // Tribe population is < 100
+    // Tribe already has language
+    if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return false;
+    if (tribe.hasTechnology("language")) return false;
+    if (tribe.population() < 100) return false;
+
+    let c : number = 0.000001;
+    if (tribe.attitudes.others == Attitudes.Others.Diplomatic) c = 0.000002;
+
+    return Random.progressiveChance(c, progress);
+  }
+
+  static progress(tribe: Tribe, region: Region) : number {
+    // Can't progress if:
+    // Tribe is unencountered
+    // Tribe population is < 100
+    if (tribe.hasTechnology("language")) return 0;
+    if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return 0;
+    if (tribe.population() < 100) return 0;
+
+    return 1;
+  }
+
+  static isChoice() : boolean {
+    return false;
+  }
+
+  static choices() : string[] {
+    return [];
+  }
+
+  static choicePrompt() : string {
+    return "";
+  }
+
+  static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+    DiscoverLanguageEvent.tribeName = DiscoverLanguageEvent.generateTribeName(tribe, region);
+    return [
+      `You notice that a tribe seems to be using a more advanced form of communication.
+      As your language coprocessor engages, you discover that they now call themselves the
+      ${DiscoverLanguageEvent.tribeName}.`
+    ];
+  }
+
+  static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {
+    const name = DiscoverLanguageEvent.tribeName;
+    return [
+      function () {
+        tribe.addTechnology("language");
+        tribe.setName(name);
+        console.log(`A tribe has discovered language.`);
+      }
+    ];
+  }
+
+  private static generateTribeName(tribe: Tribe, region: Region) : string {
+    if (tribe.hasCulture("worshipsMonolith")) {
+      if (Random.chance(0.8)) return "Worshippers of the Great Stone";
+    }
+
+    // Get the type of the region.
+    let regionDescription : string = region.typeString();
+    if (region.hasMonolith) regionDescription += " of the Great Stone";
+
+    // Determine what to call the tribe.
+    let tribeDescription : string;
+    if (tribe.hasTechnology("construction")) tribeDescription = "Builders";
+    else if (tribe.attitudes.monolith == Attitudes.Monolith.Superstitious) tribeDescription = "Worshippers";
+    else if (tribe.attitudes.others == Attitudes.Others.Aggressive) tribeDescription = "Warriors";
+    else {
+      const roll = Random.interval(0, 3);
+      switch(roll) {
+        case 0: tribeDescription = "People"; break;
+        case 1: tribeDescription = "Folk"; break;
+        case 2: tribeDescription = "Tribe"; break;
+        case 3: tribeDescription = "Community"; break;
+      }
+    }
+
+    return `${tribeDescription} of the ${regionDescription}`;
+  }
+}
+
 class TribeWorshipsMonolithEvent {
   public static id : string = "TribeWorshipsMonolithEvent";
 
@@ -576,7 +668,8 @@ class FireSpreadsEvent {
   static triggers(tribe: Tribe, region: Region, progress: number) {
     if (!(tribe.hasTechnology("fire") && tribe.hasTechnology("construction"))) return false
 
-    return Random.chance(0.001);
+    if (tribe.hasCulture("cautious")) return Random.chance(0.00001);
+    else return Random.chance(0.001);
   }
 
   static progress(tribe: Tribe, region: Region) : number {
@@ -648,6 +741,8 @@ class FireSpreadsEvent {
 
         tribe.decreasePopulation(Random.interval(lowerLimit, upperLimit));
 
+        tribe.addCulture("cautious");
+
         console.log(`New population: ${tribe.population()}`);
       }
     ];
@@ -665,4 +760,5 @@ let TribeEvents : TribeEvent[] = [
   DiscoverFireEvent,
   DiscoverToolsEvent,
   DiscoverConstructionEvent,
+  DiscoverLanguageEvent,
 ]

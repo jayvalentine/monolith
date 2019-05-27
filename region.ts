@@ -62,8 +62,12 @@ class Region {
     return this._type;
   }
 
-  // Returns the string representation of the region's type.
   typeString() : string {
+    return Region.Type[this._type];
+  }
+
+  // Returns the string description of the region's type.
+  typeDescription() : string {
     switch(this._type) {
       case Region.Type.Desert: return "desert";
       case Region.Type.Grassland: return "grassland";

@@ -104,7 +104,7 @@ class Game {
 
     for (let r of landingSites) {
       landingSiteChoices.push(
-        `A ${r.typeString()} region with ${r.foodString()} food,
+        `A ${r.typeDescription()} region with ${r.foodString()} food,
         ${r.waterString()} water, and ${r.resourcesString()} resources.
         It has ${r.population()} inhabitants, split into ${r.tribesCount()} tribe(s).`
       );

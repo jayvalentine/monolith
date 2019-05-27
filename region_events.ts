@@ -24,11 +24,11 @@ class LandingEvent {
   static outcomeMessage(region: Region) {
     return `Your temperature sensors flail wildly as you scream through the planet's atmosphere,
     blazing a trail through the sky. You slam into the ground with an earth-shattering thud, coming to rest
-    in a ${region.typeString()} region.`;
+    in a ${region.typeDescription()} region.`;
   }
 
   static outcomeFunction(region: Region) {
-    return function () {console.log(`Landing event triggered in ${region.typeString()} region.`)};
+    return function () {console.log(`Landing event triggered in ${region.typeDescription()} region.`)};
   }
 }
 
