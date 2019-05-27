@@ -226,6 +226,12 @@ class Game {
       // Trigger again in 50ms.
       setTimeout(this.run.bind(this), 20);
 
+      $("#GameDate").text(`Year ${Math.floor(this.day / 276)}, Day ${this.day % 276}`);
+
+      $('html, body').animate({
+        scrollTop: $("#GameDate").offset().top
+      }, 100);
+
       console.log(`Day ${this.day}`);
     }
   }
@@ -281,7 +287,7 @@ class Game {
     }
 
     // Fade the message in. Trigger the run method again once the fade in has completed.
-    $(`<p>${message}</p>`).appendTo("#GameMainScreen")
+    $(`<p>${message}</p>`).insertBefore("#GameDate")
     .hide().fadeIn(1000, this.run.bind(this));
   }
 
@@ -290,7 +296,7 @@ class Game {
 
     // Fade the choice in. Trigger the run method again once the fade in has completed.
     $(`<p id='choice-${index}' class='clickable' onclick='Global.game.makeChoice(${index})'>${choice}</p>`)
-    .appendTo("#GameMainScreen")
+    .insertBefore("#GameDate")
     .hide().fadeIn(500, this.run.bind(this));
   }
 }

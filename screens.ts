@@ -30,6 +30,7 @@ function startMainGame() {
   $("#GamePrologueScreen").hide();
   $("#GameStartScreen").hide();
   $("#GameMainScreen").show();
+  $("#GameDate").show();
 
   Global.game.start();
 }
