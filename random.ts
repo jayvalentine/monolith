@@ -13,8 +13,8 @@ class Random {
     else return false;
   }
 
-  static progressiveChance(c: number, progress: number) : boolean {
-    const limit = progress * c;
+  static progressiveChance(c: number, progress: number, upperBound: number) : boolean {
+    const limit = Math.min(progress * c, upperBound);
   
     if (Math.random() < limit) return true;
     else return false;

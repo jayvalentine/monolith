@@ -330,7 +330,7 @@ class DiscoverFireEvent {
     let c : number = 0.000001;
     if (tribe.attitudes.monolith == Attitudes.Monolith.Curious) c = 0.000002;
 
-    return Random.progressiveChance(c, progress);
+    return Random.progressiveChance(c, progress, 0.01);
   }
 
   static progress(tribe: Tribe, region: Region) : number {
@@ -390,7 +390,7 @@ class DiscoverToolsEvent {
     let c : number = 0.000001;
     if (tribe.attitudes.monolith == Attitudes.Monolith.Curious) c = 0.000002;
 
-    return Random.progressiveChance(c, progress);
+    return Random.progressiveChance(c, progress, 0.01);
   }
 
   static progress(tribe: Tribe, region: Region) : number {
@@ -446,7 +446,7 @@ class DiscoverConstructionEvent {
     let c : number = 0.000001;
     if (tribe.attitudes.others == Attitudes.Others.Defensive) c = 0.000002;
 
-    return Random.progressiveChance(c, progress);
+    return Random.progressiveChance(c, progress, 0.01);
   }
 
   static progress(tribe: Tribe, region: Region) : number {
@@ -509,7 +509,7 @@ class DiscoverLanguageEvent {
     let c : number = 0.000001;
     if (tribe.attitudes.others == Attitudes.Others.Diplomatic) c = 0.000002;
 
-    return Random.progressiveChance(c, progress);
+    return Random.progressiveChance(c, progress, 0.01);
   }
 
   static progress(tribe: Tribe, region: Region) : number {
@@ -596,7 +596,7 @@ class TribeWorshipsMonolithEvent {
       return false;
     }
 
-    return Random.progressiveChance(0.00001, progress);
+    return Random.progressiveChance(0.00001, progress, 0.01);
   }
 
   static progress(tribe: Tribe, region: Region) : number {
