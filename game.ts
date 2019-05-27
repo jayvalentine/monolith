@@ -24,6 +24,11 @@ class Game {
     this.events = [];
     this.choiceFlag = Game.Choice.None;
     this.choices = [];
+    this.choiceIndex = -1;
+    this.choiceOutcomes = [];
+    this.choiceOutcomeMessages = [];
+    this.outcomes = [];
+    this.outcomeMessages = [];
   }
 
   start() {
@@ -150,9 +155,9 @@ class Game {
     }
 
     else if (this.events.length > 0) {
-      let e: string[] = this.events.shift();
-      let o: (() => void)[] = this.outcomes.shift();
-      let m: string[] = this.outcomeMessages.shift();
+      let e: string[] = this.events.shift()!;
+      let o: (() => void)[] = this.outcomes.shift()!;
+      let m: string[] = this.outcomeMessages.shift()!;
 
       if (e[0] == "message") {
         // Perform the outcome, even if it is nothing.
@@ -290,7 +295,7 @@ class Game {
     setTimeout(this.run.bind(this), 2000);
 
     // Force scroll to the bottom of the screen.
-    $('html, body').scrollTop($("#GameDate").offset().top);
+    $('html, body').scrollTop($("#GameDate")!.offset().top);
   }
 
   displayChoice(index: number, choice: string) {
@@ -302,7 +307,7 @@ class Game {
     .hide().fadeIn(500, this.run.bind(this));
 
     // Force scroll to the bottom of the screen.
-    $('html, body').scrollTop($("#GameDate").offset().top);
+    $('html, body').scrollTop($("#GameDate")!.offset().top);
   }
 }
 
