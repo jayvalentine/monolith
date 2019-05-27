@@ -282,9 +282,12 @@ class Game {
       return;
     }
 
-    // Fade the message in. Trigger the run method again once the fade in has completed.
+    // Fade the message in.
     $(`<p>${message}</p>`).insertBefore("#GameDate")
-    .hide().fadeIn(1000, this.run.bind(this));
+    .hide().fadeIn(1000);
+
+    // Trigger the run method 2 seconds from now.
+    setTimeout(this.run.bind(this), 2000);
 
     // Force scroll to the bottom of the screen.
     $('html, body').scrollTop($("#GameDate").offset().top);
