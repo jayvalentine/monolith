@@ -570,11 +570,96 @@ class TribeWorshipsMonolithEvent {
   }
 }
 
+class FireSpreadsEvent {
+  public static id : string = "FireSpreadsEvent";
+
+  static triggers(tribe: Tribe, region: Region, progress: number) {
+    if (!(tribe.hasTechnology("fire") && tribe.hasTechnology("construction"))) return false
+
+    return Random.chance(0.001);
+  }
+
+  static progress(tribe: Tribe, region: Region) : number {
+    return 0;
+  }
+
+  static isChoice() : boolean {
+    return true;
+  }
+
+  static choices() : string[] {
+    return [
+      "They are being punished.",
+      "This is a learning experience."
+    ];
+  }
+
+  static choicePrompt() : string {
+    return `One day, while one of the tribespeople is cooking with fire, the roof of their home
+    catches alight. Before long, multiple buildings are in flames. The tribespeople desperately try
+    to put out the fire, and succeed, but not before it has caused significant damage.`;
+  }
+
+  static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+    return [
+      `The tribe sees this as a punishment, but for what, they are not sure.`,
+      `The tribe has suffered heavy losses, but finds the strength to continue, and learn how to control the fire better.`
+    ];
+  }
+
+  static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {
+    return [
+      function () {
+        // 20% chance for tribe to become superstitious,
+        // 80% chance for tribe to become fearful.
+        // Tribe gains the 'disasters are punishment' culture.
+        if (Random.chance(0.2)) {
+          tribe.attitudes.monolith = Attitudes.Monolith.Superstitious;
+        }
+        else {
+          tribe.attitudes.monolith = Attitudes.Monolith.Fearful;
+        }
+
+        tribe.addCulture("disastersArePunishment");
+
+        // Tribe population reduced by 50-100%.
+        const currentPopulation : number = tribe.population();
+        const lowerLimit = Math.floor(currentPopulation*0.5);
+        const upperLimit = Math.floor(currentPopulation);
+
+        tribe.decreasePopulation(Random.interval(lowerLimit, upperLimit));
+
+        console.log(`New population: ${tribe.population()}`);
+      },
+      function () {
+        // 50% chance for tribe to become curious,
+        // 50% chance for tribe to become fearful.
+        if (Random.chance(0.5)) {
+          tribe.attitudes.monolith = Attitudes.Monolith.Curious;
+        }
+        else {
+          tribe.attitudes.monolith = Attitudes.Monolith.Fearful;
+        }
+
+        // Tribe population reduced by 50-100%.
+        const currentPopulation : number = tribe.population();
+        const lowerLimit = Math.floor(currentPopulation*0.5);
+        const upperLimit = Math.floor(currentPopulation);
+
+        tribe.decreasePopulation(Random.interval(lowerLimit, upperLimit));
+
+        console.log(`New population: ${tribe.population()}`);
+      }
+    ];
+  }
+}
+
 let TribeEvents : TribeEvent[] = [
   TribeDestroyedEvent,
   EncounterEvent,
   IndirectEncounterEvent,
   TribeWorshipsMonolithEvent,
+  FireSpreadsEvent,
   AttackEvent,
   MigrationEvent,
   DiscoverFireEvent,
