@@ -8,7 +8,7 @@ interface TribeEvent {
   progress(tribe: Tribe, region: Region) : number;
 
   isChoice() : boolean;
-  choicePrompt() : string;
+  choicePrompt(tribe: Tribe) : string;
   choices() : string[];
 
   outcomeMessages(tribe: Tribe, region: Region) : string[];
@@ -39,7 +39,7 @@ class EncounterEvent {
     return [];
   }
 
-  static choicePrompt() : string {
+  static choicePrompt(tribe: Tribe) : string {
     return "";
   }
 
@@ -96,7 +96,7 @@ class IndirectEncounterEvent {
     return [];
   }
 
-  static choicePrompt() : string {
+  static choicePrompt(tribe: Tribe) : string {
     return "";
   }
 
@@ -113,7 +113,7 @@ class IndirectEncounterEvent {
 
     let attitude : string = Attitudes.MonolithString(IndirectEncounterEvent.otherTribe.attitudes.monolith);
 
-    return [`A tribe you are familiar with has encountered a new tribe of ${tribe.population()} people.
+    return [`${tribe.titleCapitalized()} has encountered a new tribe of ${tribe.population()} people.
     After hearing of you, they seem ${attitude}.`];
   }
 
@@ -122,7 +122,7 @@ class IndirectEncounterEvent {
 
     return [function () {
       tribe.attitudes.monolith = attitude;
-      console.log(`Indirect encounter: set tribe attitude to ${Attitudes.MonolithString(attitude)}`);
+      console.log(`Indirect encounter: set ${tribe.title()} attitude to ${Attitudes.MonolithString(attitude)}`);
     }];
   }
 }
@@ -147,7 +147,7 @@ class TribeDestroyedEvent {
     return [];
   }
 
-  static choicePrompt() : string {
+  static choicePrompt(tribe: Tribe) : string {
     return "";
   }
 
@@ -156,12 +156,12 @@ class TribeDestroyedEvent {
       return [""];
     }
     else {
-      return ["You sense a great loss. A tribe you have encountered is no more."];
+      return [`You sense a great loss. ${tribe.titleCapitalized()} is no more.`];
     }
   }
 
   static outcomeFunctions(tribe: Tribe, region: Region) {
-    return [function () {tribe.dead = true; console.log("A tribe has died.");}];
+    return [function () {tribe.dead = true; console.log(`${tribe.title()} has died.`);}];
   }
 }
 
@@ -194,7 +194,7 @@ class AttackEvent {
     return [];
   }
 
-  static choicePrompt() : string {
+  static choicePrompt(tribe: Tribe) : string {
     return "";
   }
 
@@ -247,7 +247,7 @@ class AttackEvent {
       outcomeMessage = `The attack ended in a stalemate.`
     }
 
-    return [`A tribe has attacked a neighbouring tribe.
+    return [`${tribe.titleCapitalized()} has attacked ${tribe.title()}.
     ${outcomeMessage}
     ${lossesMessage}`];
   }
@@ -296,7 +296,7 @@ class MigrationEvent {
     return [];
   }
 
-  static choicePrompt() : string {
+  static choicePrompt(tribe: Tribe) : string {
     return "";
   }
 
@@ -315,7 +315,7 @@ class MigrationEvent {
 
       let attitude : string = Attitudes.MonolithString(tribe.attitudes.monolith);
 
-      console.log(`A ${attitude} tribe has migrated from ${region.typeString()} to ${migrateRegion.typeString()}.`)
+      console.log(`${tribe.title()} has migrated from ${region.typeString()} to ${migrateRegion.typeString()}.`)
     }];
   }
 }
@@ -352,8 +352,8 @@ class DiscoverFireEvent {
     ];
   }
 
-  static choicePrompt() : string {
-    return `While wandering on a hot, dry day, a tribe member notices food left in the wake of a wildfire.
+  static choicePrompt(tribe: Tribe) : string {
+    return `While wandering on a hot, dry day, a member of ${tribe.title()} notices food left in the wake of a wildfire.
     Noticing that the food seems firmer and smells different, the tribesperson brings it back to show the others.`;
   }
 
@@ -370,11 +370,11 @@ class DiscoverFireEvent {
       function () {
         tribe.addTechnology("fire");
         tribe.attitudes.monolith = Attitudes.Monolith.Curious;
-        console.log(`A tribe has discovered fire.`);
+        console.log(`${tribe.title()} has discovered fire.`);
       },
       function () {
         tribe.attitudes.monolith = Attitudes.Monolith.Fearful;
-        console.log(`A tribe has shunned fire.`);
+        console.log(`${tribe.title()} has shunned fire.`);
       }
     ];
   }
@@ -409,13 +409,13 @@ class DiscoverToolsEvent {
     return [];
   }
 
-  static choicePrompt() : string {
+  static choicePrompt(tribe: Tribe) : string {
     return "";
   }
 
   static outcomeMessages(tribe: Tribe, region: Region) : string[] {
     return [
-      `A small group of tribespeople have developed simple stone tools to aid them in their daily lives.
+      `A small group from ${tribe.title()} have developed simple stone tools to aid them in their daily lives.
       They show the rest of their tribe, and the tools quickly catch on, with the tribe using them to enhance
       their abilities.`
     ];
@@ -425,7 +425,7 @@ class DiscoverToolsEvent {
     return [
       function () {
         tribe.addTechnology("tools");
-        console.log(`A tribe has discovered tools.`);
+        console.log(`${tribe.title()} has discovered tools.`);
       }
     ];
   }
@@ -470,13 +470,13 @@ class DiscoverConstructionEvent {
     return [];
   }
 
-  static choicePrompt() : string {
+  static choicePrompt(tribe: Tribe) : string {
     return "";
   }
 
   static outcomeMessages(tribe: Tribe, region: Region) : string[] {
     return [
-      `A tribe has begun using stone and wood, along with their tools, to construct
+      `${tribe.titleCapitalized()} has begun using stone and wood, along with their tools, to construct
       simple buildings in which to live and store food.`
     ];
   }
@@ -486,7 +486,7 @@ class DiscoverConstructionEvent {
       function () {
         tribe.addTechnology("construction");
         tribe.setMigrationChance(0);
-        console.log(`A tribe has discovered construction.`);
+        console.log(`${tribe.title()} has discovered construction.`);
       }
     ];
   }
@@ -500,11 +500,11 @@ class DiscoverLanguageEvent {
   static triggers(tribe: Tribe, region: Region, progress: number) : boolean {
     // Can't trigger if:
     // Tribe is unencountered
-    // Tribe population is < 100
+    // Tribe population is < 50
     // Tribe already has language
     if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return false;
     if (tribe.hasTechnology("language")) return false;
-    if (tribe.population() < 100) return false;
+    if (tribe.population() < 50) return false;
 
     let c : number = 0.000001;
     if (tribe.attitudes.others == Attitudes.Others.Diplomatic) c = 0.000002;
@@ -515,10 +515,10 @@ class DiscoverLanguageEvent {
   static progress(tribe: Tribe, region: Region) : number {
     // Can't progress if:
     // Tribe is unencountered
-    // Tribe population is < 100
+    // Tribe population is < 50
     if (tribe.hasTechnology("language")) return 0;
     if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return 0;
-    if (tribe.population() < 100) return 0;
+    if (tribe.population() < 50) return 0;
 
     return 1;
   }
@@ -531,7 +531,7 @@ class DiscoverLanguageEvent {
     return [];
   }
 
-  static choicePrompt() : string {
+  static choicePrompt(tribe: Tribe) : string {
     return "";
   }
 
@@ -615,8 +615,8 @@ class TribeWorshipsMonolithEvent {
     ];
   }
 
-  static choicePrompt() : string {
-    return `One of the nearby tribes has taken a great interest in you. Tribe members regularly visit you, bringing
+  static choicePrompt(tribe: Tribe) : string {
+    return `${tribe.titleCapitalized()} has taken a great interest in you. Tribe members regularly visit you, bringing
     small offerings and prostrating themselves at your base. It becomes obvious that this is a form of primitive worship.`;
   }
 
@@ -687,8 +687,8 @@ class FireSpreadsEvent {
     ];
   }
 
-  static choicePrompt() : string {
-    return `One day, while one of the tribespeople is cooking with fire, the roof of their home
+  static choicePrompt(tribe: Tribe) : string {
+    return `One day, while a member of ${tribe.title()} is cooking with fire, the roof of their home
     catches alight. Before long, multiple buildings are in flames. The tribespeople desperately try
     to put out the fire, and succeed, but not before it has caused significant damage.`;
   }

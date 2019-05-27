@@ -190,7 +190,7 @@ class Game {
               tribe.resetProgress(tribeEvent);
 
               if (tribeEvent.isChoice()) {
-                this.queueMessage(tribeEvent.choicePrompt(), function () {});
+                this.queueMessage(tribeEvent.choicePrompt(tribe), function () {});
                 this.queueChoice(tribeEvent.choices(),
                                  tribeEvent.outcomeMessages(tribe, region),
                                  tribeEvent.outcomeFunctions(tribe, region));

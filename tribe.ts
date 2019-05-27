@@ -152,6 +152,11 @@ class Tribe {
     else return "the " + this._name;
   }
 
+  titleCapitalized() : string {
+    if (this._name == "") return "A tribe";
+    else return "The " + this._name;
+  }
+
   setName(name: string) {
     this._name = name;
   }
