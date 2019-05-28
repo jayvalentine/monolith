@@ -53,7 +53,8 @@ class EncounterEvent {
     }
 
     return [`You encounter a tribe of ${tribe.population()} people.
-    They are ${tribe.attitudes.othersString()}.
+    They are ${tribe.attitudes.othersString()}, ${tribe.attitudes.worldString()},
+    and ${tribe.attitudes.selfString()}.
     They seem ${Attitudes.MonolithString(EncounterEvent.newAttitude)} towards you.`];
   }
 

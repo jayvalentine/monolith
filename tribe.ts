@@ -34,13 +34,24 @@ class Tribe {
 
     this.dead = false;
 
-    const othersRoll = Random.interval(0, 3);
-    switch (othersRoll) {
-      case 0: this.attitudes.others = Attitudes.Others.Aggressive; break;
-      case 1: this.attitudes.others = Attitudes.Others.Defensive; break;
-      case 2: this.attitudes.others = Attitudes.Others.Diplomatic; break;
-      case 3: this.attitudes.others = Attitudes.Others.Insular; break;
-    }
+    this.attitudes.others = Random.choice([
+      Attitudes.Others.Aggressive,
+      Attitudes.Others.Defensive,
+      Attitudes.Others.Diplomatic,
+      Attitudes.Others.Insular
+    ]);
+
+    this.attitudes.world = Random.choice([
+      Attitudes.World.Exploit,
+      Attitudes.World.Explore,
+      Attitudes.World.Harmony,
+      Attitudes.World.Survival
+    ])
+
+    this.attitudes.self = Random.choice([
+      Attitudes.Self.Hierarchical,
+      Attitudes.Self.Egalitarian
+    ])
   }
 
   population() : number {
@@ -183,6 +194,8 @@ class Tribe {
 class Attitudes {
   public monolith: Attitudes.Monolith;
   public others: Attitudes.Others;
+  public world: Attitudes.World;
+  public self: Attitudes.Self;
 
   static MonolithString(monolith: Attitudes.Monolith) : string {
     switch(monolith) {
@@ -202,6 +215,22 @@ class Attitudes {
     }
   }
 
+  static WorldString(world: Attitudes.World) : string {
+    switch(world) {
+      case Attitudes.World.Exploit: return "exploitative";
+      case Attitudes.World.Explore: return "explorative";
+      case Attitudes.World.Harmony: return "harmonious";
+      case Attitudes.World.Survival: return "survivalists";
+    }
+  }
+
+  static SelfString(self: Attitudes.Self) : string {
+    switch(self) {
+      case Attitudes.Self.Hierarchical: return "hierarchical";
+      case Attitudes.Self.Egalitarian: return "egalitarian";
+    }
+  }
+
   constructor() {
 
   }
@@ -212,6 +241,14 @@ class Attitudes {
 
   othersString() : string {
     return Attitudes.OthersString(this.others);
+  }
+
+  worldString() : string {
+    return Attitudes.WorldString(this.world);
+  }
+
+  selfString() : string {
+    return Attitudes.SelfString(this.self);
   }
 }
 
@@ -228,5 +265,17 @@ namespace Attitudes {
     Defensive = "defensive",
     Diplomatic = "diplomatic",
     Insular = "insular",
+  }
+
+  export enum World {
+    Exploit = "exploit",
+    Explore = "explore",
+    Harmony = "harmony",
+    Survival = "survival",
+  }
+
+  export enum Self {
+    Hierarchical = "hierarchical",
+    Egalitarian = "egalitarian",
   }
 }
