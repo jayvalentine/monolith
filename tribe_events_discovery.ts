@@ -13,7 +13,7 @@ class DiscoverFireEvent {
       let c : number = 0.000001;
       if (tribe.attitudes.monolith == Attitudes.Monolith.Curious) c = 0.000002;
   
-      return Random.progressiveChance(c, progress, 0.01);
+      return Random.progressiveChance(c, progress, 0.005);
     }
   
     static progress(tribe: Tribe, region: Region) : number {
@@ -21,8 +21,8 @@ class DiscoverFireEvent {
       if (tribe.hasCulture("afraidOfFire")) return 0;
       if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return 0;
   
-      if (region.type() == Region.Type.Desert) return Random.interval(1, 2);
-      else return Random.interval(0, 1);
+      if (region.type() == Region.Type.Desert) return Random.interval(0, 3);
+      else return Random.interval(-1, 2);
     }
   
     static isChoice() : boolean {
@@ -79,15 +79,15 @@ class DiscoverFireEvent {
       let c : number = 0.000001;
       if (tribe.attitudes.monolith == Attitudes.Monolith.Curious) c = 0.000002;
   
-      return Random.progressiveChance(c, progress, 0.01);
+      return Random.progressiveChance(c, progress, 0.005);
     }
   
     static progress(tribe: Tribe, region: Region) : number {
       if (tribe.hasTechnology("tools")) return 0;
       if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return 0;
   
-      if (region.resources() > 2) return Random.interval(1, 3);
-      else return Random.interval(0, 2);
+      if (region.resources() > 2) return Random.interval(0, 3);
+      else return Random.interval(-1, 2);
     }
   
     static isChoice() : boolean {
@@ -135,7 +135,7 @@ class DiscoverFireEvent {
       let c : number = 0.000001;
       if (tribe.attitudes.others == Attitudes.Others.Defensive) c = 0.000002;
   
-      return Random.progressiveChance(c, progress, 0.01);
+      return Random.progressiveChance(c, progress, 0.005);
     }
   
     static progress(tribe: Tribe, region: Region) : number {
@@ -147,7 +147,7 @@ class DiscoverFireEvent {
       if (tribe.hasTechnology("construction")) return 0;
       if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return 0;
   
-      if (region.resources() > 0) return 1;
+      if (region.resources() > 0) return Random.interval(0, 1);
       else return 0;
     }
   
@@ -306,9 +306,9 @@ class DiscoverFireEvent {
       if (tribe.population() < 200) return 0;
       if (!tribe.hasTechnology("tools")) return 0;
   
-      if (region.food() > 4) return Random.interval(2, 5);
-      else if (region.food() > 2) return Random.interval(1, 4);
-      else return Random.interval(0, 3);
+      if (region.food() > 4) return Random.interval(1, 5);
+      else if (region.food() > 2) return Random.interval(-1, 4);
+      else return Random.interval(-2, 3);
     }
   
     static isChoice() : boolean {

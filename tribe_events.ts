@@ -418,7 +418,7 @@ class TribeBuildsTempleEvent {
     // Only triggers once per game.
     if (TribeBuildsTempleEvent.triggered) return false;
 
-    if (Random.progressiveChance(0.0001, progress, 0.1)) {
+    if (Random.progressiveChance(0.00001, progress, 0.05)) {
       TribeBuildsTempleEvent.triggered = true;
       return true;
     }
@@ -489,7 +489,7 @@ class FireSpreadsEvent {
     if (!(tribe.hasTechnology("fire") && tribe.hasTechnology("construction"))) return false
 
     if (tribe.hasCulture("cautious")) return Random.chance(0.000001);
-    else return Random.chance(0.0001);
+    else return Random.chance(0.00003);
   }
 
   static progress(tribe: Tribe, region: Region) : number {
@@ -569,6 +569,94 @@ class FireSpreadsEvent {
   }
 }
 
+class FirstStoriesEvent {
+  public static id : string = "FirstStoriesEvent";
+
+  static triggers(tribe: Tribe, region: Region, progress: number) {
+    // Does not trigger if:
+    // Tribe is unencountered.
+    // Tribe does not have language.
+    // Tribe does not have > 200 population.
+    if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return false;
+    if (!tribe.hasTechnology("language")) return false;
+    if (!tribe.hasTechnology("agriculture")) return false;
+
+    if (tribe.hasCulture("stories")) return false;
+
+    return Random.progressiveChance(0.00001, progress, 0.005);
+  }
+
+  static progress(tribe: Tribe, region: Region) : number {
+    if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return 0;
+    if (!tribe.hasTechnology("language")) return 0;
+    if (!tribe.hasTechnology("agriculture")) return 0;
+
+    if (tribe.hasCulture("stories")) return 0;
+
+    return Random.interval(0, 3);
+  }
+
+  static isChoice() : boolean {
+    return false;
+  }
+
+  static choices() : string[] {
+    return [];
+  }
+
+  static choicePrompt(tribe: Tribe) : string {
+    return "";
+  }
+
+  static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+    let othersTheme : string = "";
+    switch (tribe.attitudes.others) {
+      case Attitudes.Others.Aggressive: othersTheme = "heroes of war"; break;
+      case Attitudes.Others.Defensive: othersTheme = "defenders of their people"; break;
+      case Attitudes.Others.Diplomatic: othersTheme = "friendship with other tribes"; break;
+      case Attitudes.Others.Insular: othersTheme = "fear of other tribes"; break;
+    }
+
+    let worldTheme : string = "";
+    switch (tribe.attitudes.world) {
+      case Attitudes.World.Exploit: worldTheme = "exploitation of their environment"; break;
+      case Attitudes.World.Explore: worldTheme = "exploration of the unknown"; break;
+      case Attitudes.World.Harmony: worldTheme = "living in harmony with nature"; break;
+      case Attitudes.World.Survival: worldTheme = "surviving in their dangerous environment"; break;
+    }
+
+    let selfTheme : string = "";
+    switch (tribe.attitudes.self) {
+      case Attitudes.Self.Hierarchical: selfTheme = "their rightful rulers"; break;
+      case Attitudes.Self.Egalitarian: selfTheme = "their egalitarian society"; break;
+    }
+
+    // We don't have to handle the unencountered attitude as we guard against that when
+    // deciding if the event triggers.
+    let monolithTheme : string = "";
+    switch (tribe.attitudes.monolith) {
+      case Attitudes.Monolith.Curious: monolithTheme = "their curiosity about the Great Stone"; break;
+      case Attitudes.Monolith.Superstitious: monolithTheme = "their reverance of the Great Stone"; break;
+      case Attitudes.Monolith.Fearful: monolithTheme = "their fear of the Great Stone"; break;
+    }
+
+    return [
+      `${tribe.titleCapitalized()} has begun telling stories in the evenings once all their
+      work for the day is done. The major themes of their stories are ${othersTheme}, ${worldTheme},
+      ${selfTheme}, and ${monolithTheme}.`
+    ];
+  }
+
+  static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {
+    return [
+      function () {
+        tribe.addCulture("stories");
+        console.log(`${tribe.title()} has begun writing stories.`);
+      }
+    ];
+  }
+}
+
 let TribeEvents : TribeEvent[] = [
   TribeDestroyedEvent,
   EncounterEvent,
@@ -576,6 +664,7 @@ let TribeEvents : TribeEvent[] = [
   TribeWorshipsMonolithEvent,
   TribeBuildsTempleEvent,
   FireSpreadsEvent,
+  FirstStoriesEvent,
   AttackEvent,
   MigrationEvent,
   DiscoverFireEvent,
