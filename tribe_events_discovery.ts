@@ -271,3 +271,72 @@ class DiscoverFireEvent {
       return `${tribeDescription} of the ${regionDescription}`;
     }
   }
+
+  class DiscoverAgricultureEvent {
+    public static readonly id : string = "DiscoverAgricultureEvent";
+  
+    static triggers(tribe: Tribe, region: Region, progress: number) : boolean {
+      // Can't trigger if:
+      // Tribe is unencountered
+      // Tribe population is < 200
+      // Tribe doesn't have tools
+      // Tribe already has agriculture
+      if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return false;
+      if (tribe.hasTechnology("agriculture")) return false;
+      if (tribe.population() < 200) return false;
+      if (!tribe.hasTechnology("tools")) return false;
+  
+      let c : number = 0.000001;
+
+      // Increase chance in regions with high food.
+      if (region.food() > 4) c = 0.000005;
+      else if (region.food() > 2) c = 0.000002;
+      
+      return Random.progressiveChance(c, progress, 0.01);
+    }
+  
+    static progress(tribe: Tribe, region: Region) : number {
+      // Can't progress if:
+      // Tribe is unencountered
+      // Tribe population is < 200
+      // Tribe doesn't have tools.
+      if (tribe.hasTechnology("agriculture")) return 0;
+
+      if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return 0;
+      if (tribe.population() < 200) return 0;
+      if (!tribe.hasTechnology("tools")) return 0;
+  
+      if (region.food() > 4) return Random.interval(2, 5);
+      else if (region.food() > 2) return Random.interval(1, 4);
+      else return Random.interval(0, 3);
+    }
+  
+    static isChoice() : boolean {
+      return false;
+    }
+  
+    static choices() : string[] {
+      return [];
+    }
+  
+    static choicePrompt(tribe: Tribe) : string {
+      return "";
+    }
+  
+    static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+      return [
+        `A handful of members of ${tribe.title()} seem to have stopped hunting or gathering,
+        and instead have begun collecting wild seeds and planting them. After the first harvest,
+        this new method of producing food is adopted by the whole tribe.`
+      ];
+    }
+  
+    static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {
+      return [
+        function () {
+          tribe.addTechnology("agriculture");
+          console.log(`A tribe has discovered agriculture.`);
+        }
+      ];
+    }
+  }

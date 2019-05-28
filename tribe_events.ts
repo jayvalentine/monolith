@@ -487,8 +487,8 @@ class FireSpreadsEvent {
   static triggers(tribe: Tribe, region: Region, progress: number) {
     if (!(tribe.hasTechnology("fire") && tribe.hasTechnology("construction"))) return false
 
-    if (tribe.hasCulture("cautious")) return Random.chance(0.00001);
-    else return Random.chance(0.001);
+    if (tribe.hasCulture("cautious")) return Random.chance(0.000001);
+    else return Random.chance(0.0001);
   }
 
   static progress(tribe: Tribe, region: Region) : number {
@@ -534,10 +534,10 @@ class FireSpreadsEvent {
 
         tribe.addCulture("disastersArePunishment");
 
-        // Tribe population reduced by 50-100%.
+        // Tribe population reduced by 30-70%.
         const currentPopulation : number = tribe.population();
-        const lowerLimit = Math.floor(currentPopulation*0.5);
-        const upperLimit = Math.floor(currentPopulation);
+        const lowerLimit = Math.floor(currentPopulation*0.3);
+        const upperLimit = Math.floor(currentPopulation*0.7);
 
         tribe.decreasePopulation(Random.interval(lowerLimit, upperLimit));
 
@@ -553,10 +553,10 @@ class FireSpreadsEvent {
           tribe.attitudes.monolith = Attitudes.Monolith.Fearful;
         }
 
-        // Tribe population reduced by 50-100%.
+        // Tribe population reduced by 30-70%.
         const currentPopulation : number = tribe.population();
-        const lowerLimit = Math.floor(currentPopulation*0.5);
-        const upperLimit = Math.floor(currentPopulation);
+        const lowerLimit = Math.floor(currentPopulation*0.3);
+        const upperLimit = Math.floor(currentPopulation*0.7);
 
         tribe.decreasePopulation(Random.interval(lowerLimit, upperLimit));
 
@@ -581,4 +581,5 @@ let TribeEvents : TribeEvent[] = [
   DiscoverToolsEvent,
   DiscoverConstructionEvent,
   DiscoverLanguageEvent,
+  DiscoverAgricultureEvent,
 ]
