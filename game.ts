@@ -239,7 +239,19 @@ class Game {
       // Trigger again in 50ms.
       setTimeout(this.run.bind(this), 20);
 
-      $("#GameDate").text(`Year ${Math.floor(this.day / 276)}, Day ${this.day % 276}. Population ${populationCount} (Encountered).`);
+      let populationString : string;
+
+      if (populationCount > 1000000) {
+        populationString = `${(populationCount/1000000).toFixed(2)}M`;
+      }
+      else if (populationCount > 1000) {
+        populationString = `${(populationCount/1000).toFixed(2)}K`;
+      }
+      else {
+        populationString = `${populationCount}`;
+      }
+
+      $("#GameDate").text(`Year ${Math.floor(this.day / 276)}, Day ${this.day % 276}. Population ${populationString} (Encountered).`);
 
       console.log(`Day ${this.day}`);
     }
