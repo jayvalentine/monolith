@@ -174,6 +174,9 @@ class Game {
     }
 
     else {
+      // Initialise population count to 0.
+      let populationCount : number = 0;
+
       // See if any region events trigger.
       for (let region of this.regions) {
         for (let regionEvent of RegionEvents) {
@@ -186,6 +189,11 @@ class Game {
         let tribesToRemove : Tribe[] = []
 
         for (let tribe of region.tribes()) {
+          // If the tribe has been encountered, add its population to the total.
+          if (tribe.attitudes.monolith != Attitudes.Monolith.Unencountered) {
+            populationCount += tribe.population();
+          }
+
           let triggered : boolean = false;
 
           for (let tribeEvent of TribeEvents) {
@@ -231,7 +239,7 @@ class Game {
       // Trigger again in 50ms.
       setTimeout(this.run.bind(this), 20);
 
-      $("#GameDate").text(`Year ${Math.floor(this.day / 276)}, Day ${this.day % 276}`);
+      $("#GameDate").text(`Year ${Math.floor(this.day / 276)}, Day ${this.day % 276}. Population ${populationCount} (Encountered).`);
 
       console.log(`Day ${this.day}`);
     }
