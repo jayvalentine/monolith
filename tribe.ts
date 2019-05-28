@@ -166,7 +166,7 @@ class Tribe {
   private growthRate() : number {
     let g : number = 0.0001;
 
-    if (this.hasTechnology("fire")) g = 10 * g;
+    if (this.hasTechnology("fire")) g = 2 * g;
 
     return g;
   }
