@@ -76,23 +76,14 @@ class Tribe {
     const growthRate = this.growthRate();
     const deathRate = this.deathRate();
 
-    // Every two people in the tribe has a chance to produce offspring.
-    for (let i = 0; i < (Math.floor(this.population()/2)); i++) {
-      if (Random.chance(growthRate)) growthCount++;
-    }
-
-    // Every person in the tribe has a chance to die.
-    for (let i = 0; i < this.population(); i++) {
-      if (Random.chance(deathRate)) deathCount++;
+    for (let i = 0; i < 20; i++) {
+      if (Random.chance(growthRate)) growthCount += (Math.floor(this.population()*0.05));
+      if (Random.chance(deathRate)) deathCount += (Math.floor(this.population()*0.05));
     }
 
     // Increase population by growth count and decrease by death count.
     this.increasePopulation(growthCount);
     this.decreasePopulation(deathCount);
-
-    const difference = (this.population() - oldPopulation);
-    if (difference > 0) console.log(`A tribe has grown by ${difference}.`);
-    else if (difference < 0) console.log(`A tribe's population has decreased by ${-difference}.`);
   }
 
   attack() : number {
@@ -185,7 +176,7 @@ class Tribe {
   }
 
   private deathRate() : number {
-    let d : number = 0.00005;
+    let d : number = 0.0001;
 
     return d;
   }
