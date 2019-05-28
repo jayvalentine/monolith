@@ -576,7 +576,7 @@ class FirstStoriesEvent {
     // Does not trigger if:
     // Tribe is unencountered.
     // Tribe does not have language.
-    // Tribe does not have > 200 population.
+    // Tribe does not have agriculture.
     if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return false;
     if (!tribe.hasTechnology("language")) return false;
     if (!tribe.hasTechnology("agriculture")) return false;
@@ -657,6 +657,143 @@ class FirstStoriesEvent {
   }
 }
 
+class OralHistoryEvent {
+  public static id : string = "OralHistoryEvent";
+
+  static triggers(tribe: Tribe, region: Region, progress: number) {
+    // Does not trigger if:
+    // Tribe is unencountered.
+    // Tribe does not have stories.
+    // Tribe does not have > 400 population.
+    if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return false;
+    if (!tribe.hasCulture("stories")) return false;
+    if (tribe.population() < 400) return false;
+
+    if (tribe.hasCulture("oralHistory")) return false;
+    if (tribe.hasCulture("noHistory")) return false;
+
+    return Random.progressiveChance(0.00001, progress, 0.005);
+  }
+
+  static progress(tribe: Tribe, region: Region) : number {
+    if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return 0;
+    if (!tribe.hasCulture("stories")) return 0;
+    if (tribe.population() < 400) return 0;
+
+    if (tribe.hasCulture("oralHistory")) return 0;
+    if (tribe.hasCulture("noHistory")) return 0;
+
+    return Random.interval(0, 3);
+  }
+
+  static isChoice() : boolean {
+    return true;
+  }
+
+  static choices() : string[] {
+    return [
+      "The past is not important.",
+      "The past should be remembered."
+    ];
+  }
+
+  static choicePrompt(tribe: Tribe) : string {
+    return `The simple stories of ${tribe.title()} have evolved into more complex tales,
+    often depicting events that occurred in the tribe's past. These tales
+    form an oral history through which the tribe remembers its origins.`;
+  }
+
+  static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+    return [
+      `The tribe is not interested in the past, and the tales reflect this, no longer emphasising the
+      tribe's history.`,
+      `The tales become a central part of the tribe's culture, with all members gathering regularly
+      to hear about the events of the past.`
+    ];
+  }
+
+  static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {
+    return [
+      function () {
+        tribe.addCulture("noHistory");
+        console.log(`${tribe.title()} rejects oral history.`)
+      },
+      function () {
+        tribe.addCulture("oralHistory");
+        console.log(`${tribe.title()} has begun oral history.`);
+      }
+    ];
+  }
+}
+
+class PriestClassEvent {
+  public static id : string = "PriestClassEvent";
+
+  static triggers(tribe: Tribe, region: Region, progress: number) {
+    // Does not trigger if:
+    // Tribe is unencountered.
+    // Tribe has oral history (i.e. doesn't have the no-history culture).
+    // Tribe is not supersitious or hierarchical.
+    if (tribe.attitudes.monolith != Attitudes.Monolith.Superstitious) return false;
+    if (!tribe.hasCulture("noHistory")) return false;
+    if (!tribe.hasCulture("worshipsMonolith")) return false;
+
+    if (tribe.hasCulture("priestsRule")) return false;
+
+    return Random.progressiveChance(0.00001, progress, 0.005);
+  }
+
+  static progress(tribe: Tribe, region: Region) : number {
+    if (tribe.attitudes.monolith != Attitudes.Monolith.Superstitious) return 0;
+    if (!tribe.hasCulture("noHistory")) return 0;
+    if (!tribe.hasCulture("worshipsMonolith")) return 0;
+
+    if (tribe.hasCulture("priestsRule")) return 0;
+
+    return Random.interval(0, 3);
+  }
+
+  static isChoice() : boolean {
+    return true;
+  }
+
+  static choices() : string[] {
+    return [
+      "The priests do not speak for me.",
+      "The priests are my messengers."
+    ];
+  }
+
+  static choicePrompt(tribe: Tribe) : string {
+    return `A priestly class has developed in ${tribe.title()}, with a select group of priests
+    claiming to be your messengers and acting in accordance with your will. The priests use stories
+    and myths to influence the other tribespeople, who, without any understanding of their history,
+    have no reason not to believe them.`;
+  }
+
+  static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+    return [
+      `The priests convince the rest of the tribe that your displeasure is the result of some
+      wrongdoing on their part. Before long, the tribespeople are desperate for the guidance of their
+      religious leaders, who are all too happy to oblige.`,
+      `With your blessing, the priests continue their rule over the other tribespeople.`
+    ];
+  }
+
+  static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {
+    return [
+      function () {
+        tribe.addCulture("priestsRule");
+        tribe.attitudes.self = Attitudes.Self.Hierarchical;
+      },
+      function () {
+        tribe.addCulture("priestsRule");
+        tribe.attitudes.self = Attitudes.Self.Hierarchical;
+      }
+    ];
+  }
+}
+
 let TribeEvents : TribeEvent[] = [
   TribeDestroyedEvent,
   EncounterEvent,
@@ -665,6 +802,8 @@ let TribeEvents : TribeEvent[] = [
   TribeBuildsTempleEvent,
   FireSpreadsEvent,
   FirstStoriesEvent,
+  OralHistoryEvent,
+  PriestClassEvent,
   AttackEvent,
   MigrationEvent,
   DiscoverFireEvent,
