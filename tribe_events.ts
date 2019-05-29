@@ -250,7 +250,7 @@ class AttackEvent {
       outcomeMessage = `The attack ended in a stalemate.`
     }
 
-    return [`${tribe.titleCapitalized()} has attacked ${tribe.title()}.
+    return [`${attacker.titleCapitalized()} has attacked ${AttackEvent.defender.title()}.
     ${outcomeMessage}
     ${lossesMessage}`];
   }
@@ -716,6 +716,7 @@ let TribeEvents : TribeEvent[] = [
   TribeBuildsTempleEvent,
   FireSpreadsEvent,
   DroughtEvent,
+  PlagueEvent,
   FirstStoriesEvent,
   OralHistoryEvent,
   PriestClassEvent,

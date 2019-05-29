@@ -205,3 +205,65 @@ class DroughtEvent {
     ];
   }
 }
+
+class PlagueEvent {
+    public static id : string = "PlagueEvent";
+  
+    static triggers(tribe: Tribe, region: Region, progress: number) {
+      if (tribe.hasTechnology("vaccines")) return false;
+
+      if (tribe.population() < 1000) return false;
+
+      if (tribe.hasTechnology("medicine")) return Random.chance(0.001);
+      else return Random.chance(0.005);
+    }
+  
+    static progress(tribe: Tribe, region: Region) : number {
+      return 0;
+    }
+  
+    static isChoice() : boolean {
+      return false;
+    }
+  
+    static choices() : string[] {
+      return [];
+    }
+  
+    static choicePrompt(tribe: Tribe) : string {
+      return "";
+    }
+  
+    static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+      let message : string = `With the population of ${tribe.title()} growing rapidly, disease is commonplace in their settlement.
+        Before long, a plague spreads among the tribespeople, killing a significant number of them.`;
+
+      if (tribe.hasCulture("disastersArePunishment")) {
+        message += ` Many in the tribe see this as a punishment for their sins, and pray to you for forgiveness.`;
+      }
+      else if (tribe.attitudes.monolith == Attitudes.Monolith.Curious) {
+        message += ` Some of the tribespeople are committed to finding a way to avoid plagues like this in the future.`;
+      }
+
+      return [message];
+    }
+  
+    static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {
+      return [
+        function () {
+          // Tribe population reduced by 70-95%.
+          const currentPopulation : number = tribe.population();
+          const lowerLimit = Math.floor(currentPopulation*0.7);
+          const upperLimit = Math.floor(currentPopulation*0.95);
+  
+          tribe.decreasePopulation(Random.interval(lowerLimit, upperLimit));
+  
+          console.log(`New population: ${tribe.population()}`);
+
+          if (tribe.attitudes.monolith == Attitudes.Monolith.Curious) {
+            tribe.addCulture("earlyScientists");
+          }
+        }
+      ];
+    }
+  }
