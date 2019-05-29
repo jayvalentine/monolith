@@ -234,7 +234,7 @@ class DiscoverFireEvent {
       return [
         `You notice that a tribe seems to be using a more advanced form of communication.
         As your language coprocessor engages, you discover that they now call themselves the
-        ${DiscoverLanguageEvent.language.translate(DiscoverLanguageEvent.tribeName)}.`
+        ${Language.toTitle(DiscoverLanguageEvent.language.translate(DiscoverLanguageEvent.tribeName))}.`
       ];
     }
   
@@ -244,32 +244,40 @@ class DiscoverFireEvent {
       return [
         function () {
           tribe.addTechnology("language");
-          tribe.setName(language.translate(tribeName));
+          tribe.setName(Language.toTitle(language.translate(tribeName)));
           console.log(`A tribe has discovered language.`);
         }
       ];
     }
   
     private static generateTribeName(tribe: Tribe, region: Region) : Noun[] {
-      if (tribe.hasCulture("worshipsMonolith")) {
-        if (Random.chance(0.8)) return [
-          new Noun("worshipper", true, false, []),
-          new Noun("stone", false, true, ["great"])
-        ];
-      }
-  
       // Determine what to call the tribe.
-      let tribeDescription : Noun[];
-      if (tribe.hasTechnology("construction")) {
-        tribeDescription = [new Noun("builder", true, false, [])];
+      let tribeDescription : Noun[] = [];
+
+      let adjective : string = "";
+      
+      if (tribe.attitudes.monolith == Attitudes.Monolith.Superstitious) {
+        adjective = "devout";
       }
-      else if (tribe.attitudes.monolith == Attitudes.Monolith.Superstitious) {
-        tribeDescription = [new Noun("worshipper", true, false, [])];
+      else if (tribe.attitudes.monolith == Attitudes.Monolith.Curious) {
+        adjective = "curious";
       }
-      else if (tribe.attitudes.others == Attitudes.Others.Aggressive) {
-        tribeDescription = [new Noun("warrior", true, false, [])];
+      else if (tribe.attitudes.monolith == Attitudes.Monolith.Fearful) {
+        adjective = "fearful";
       }
-      else tribeDescription = [new Noun("person", true, false, [])];
+
+      if (tribe.attitudes.others == Attitudes.Others.Aggressive) {
+        tribeDescription.push(new Noun("warrior", true, false, [adjective]));
+      }
+      else if (tribe.attitudes.world == Attitudes.World.Explore) {
+        tribeDescription.push(new Noun("explorer", true, false, [adjective]));
+      }
+      else if (tribe.attitudes.self == Attitudes.Self.Egalitarian) {
+        tribeDescription.push(new Noun("community", false, false, [adjective]));
+      }
+      else {
+        tribeDescription.push(new Noun("person", true, false, [adjective]));
+      }
 
       return tribeDescription;
     }

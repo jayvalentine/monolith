@@ -37,6 +37,15 @@ class Noun {
 }
 
 class Language {
+    public static capitalize(word: string) : string {
+        let restOfWord : string = word.slice(1);
+        return word.charAt(0).toUpperCase() + restOfWord;
+    }
+
+    public static toTitle(sentence: string) : string {
+      return sentence.split(' ').map(Language.capitalize).join(' ');
+    }
+
     private static getSuffix() : Suffix {
         let optional : string = Random.choice(Vowel);
 
