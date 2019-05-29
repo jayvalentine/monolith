@@ -69,6 +69,18 @@ class Region {
     return Region.Type[this._type];
   }
 
+  typeStringLowercase() : string {
+    switch(this._type) {
+      case Region.Type.Desert: return "desert";
+      case Region.Type.Grassland: return "grassland";
+      case Region.Type.Hills: return "hills";
+      case Region.Type.Mountains: return "mountains";
+      case Region.Type.Tundra: return "tundra";
+      case Region.Type.Valley: return "valley";
+      case Region.Type.Rainforest: return "rainforest";
+    }
+  }
+
   // Returns the string description of the region's type.
   typeDescription() : string {
     switch(this._type) {

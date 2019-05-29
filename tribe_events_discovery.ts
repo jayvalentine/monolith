@@ -1,6 +1,7 @@
 /// <reference path="random.ts">
 /// <reference path="tribe.ts">
 /// <reference path="region.ts">
+/// <reference path="language.ts">
 
 class DiscoverFireEvent {
     public static readonly id : string = "DiscoverFireEvent";
@@ -184,7 +185,8 @@ class DiscoverFireEvent {
   class DiscoverLanguageEvent {
     public static readonly id : string = "DiscoverLanguageEvent";
   
-    private static tribeName : string;
+    private static language : Language;
+    private static tribeName : Noun[];
   
     static triggers(tribe: Tribe, region: Region, progress: number) : boolean {
       // Can't trigger if:
@@ -225,50 +227,51 @@ class DiscoverFireEvent {
     }
   
     static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+      DiscoverLanguageEvent.language = new Language();
+
       DiscoverLanguageEvent.tribeName = DiscoverLanguageEvent.generateTribeName(tribe, region);
+
       return [
         `You notice that a tribe seems to be using a more advanced form of communication.
         As your language coprocessor engages, you discover that they now call themselves the
-        ${DiscoverLanguageEvent.tribeName}.`
+        ${DiscoverLanguageEvent.language.translate(DiscoverLanguageEvent.tribeName)}.`
       ];
     }
   
     static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {
-      const name = DiscoverLanguageEvent.tribeName;
+      const language = DiscoverLanguageEvent.language;
+      const tribeName = DiscoverLanguageEvent.tribeName;
       return [
         function () {
           tribe.addTechnology("language");
-          tribe.setName(name);
+          tribe.setName(language.translate(tribeName));
           console.log(`A tribe has discovered language.`);
         }
       ];
     }
   
-    private static generateTribeName(tribe: Tribe, region: Region) : string {
+    private static generateTribeName(tribe: Tribe, region: Region) : Noun[] {
       if (tribe.hasCulture("worshipsMonolith")) {
-        if (Random.chance(0.8)) return "Worshippers of the Great Stone";
+        if (Random.chance(0.8)) return [
+          new Noun("worshipper", true, false, []),
+          new Noun("stone", false, true, ["great"])
+        ];
       }
-  
-      // Get the type of the region.
-      let regionDescription : string = region.typeString();
-      if (region.hasMonolith) regionDescription += " of the Great Stone";
   
       // Determine what to call the tribe.
-      let tribeDescription : string;
-      if (tribe.hasTechnology("construction")) tribeDescription = "Builders";
-      else if (tribe.attitudes.monolith == Attitudes.Monolith.Superstitious) tribeDescription = "Worshippers";
-      else if (tribe.attitudes.others == Attitudes.Others.Aggressive) tribeDescription = "Warriors";
-      else {
-        const roll = Random.interval(0, 3);
-        switch(roll) {
-          case 0: tribeDescription = "People"; break;
-          case 1: tribeDescription = "Folk"; break;
-          case 2: tribeDescription = "Tribe"; break;
-          case 3: tribeDescription = "Community"; break;
-        }
+      let tribeDescription : Noun[];
+      if (tribe.hasTechnology("construction")) {
+        tribeDescription = [new Noun("builder", true, false, [])];
       }
-  
-      return `${tribeDescription} of the ${regionDescription}`;
+      else if (tribe.attitudes.monolith == Attitudes.Monolith.Superstitious) {
+        tribeDescription = [new Noun("worshipper", true, false, [])];
+      }
+      else if (tribe.attitudes.others == Attitudes.Others.Aggressive) {
+        tribeDescription = [new Noun("warrior", true, false, [])];
+      }
+      else tribeDescription = [new Noun("person", true, false, [])];
+
+      return tribeDescription;
     }
   }
 
