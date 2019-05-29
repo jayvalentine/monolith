@@ -136,6 +136,14 @@ class Tribe {
     this._technology.push(technology);
   }
 
+  removeTechnology(technology: string) {
+    // Return silently if tribe doesn't have technology.
+    const i = this._technology.indexOf(technology);
+    if (i == -1) return;
+
+    this._technology.splice(i, 1);
+  }
+
   hasTechnology(technology: string) : boolean {
     if (this._technology.indexOf(technology) > -1) return true;
     else return false;

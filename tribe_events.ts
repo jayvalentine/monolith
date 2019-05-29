@@ -569,6 +569,123 @@ class FireSpreadsEvent {
   }
 }
 
+class DroughtEvent {
+  public static id : string = "DroughtEvent";
+
+  static triggers(tribe: Tribe, region: Region, progress: number) {
+    if (!tribe.hasTechnology("agriculture")) return false;
+    
+    // Chance dependent on water in region.
+    // 0 chance if water > 2.
+    switch (region.water()) {
+      case 0: return Random.chance(0.0005);
+      case 1: return Random.chance(0.0001);
+      case 2: return Random.chance(0.00005);
+      default: return false;
+    }
+  }
+
+  static progress(tribe: Tribe, region: Region) : number {
+    return 0;
+  }
+
+  static isChoice() : boolean {
+    return true;
+  }
+
+  static choices() : string[] {
+    return [
+      "They are being punished.",
+      "They must leave this barren place.",
+      "They must abandon their farms and hunt for food instead."
+    ];
+  }
+
+  static choicePrompt(tribe: Tribe) : string {
+    return `There have not been any rains in the region for some time, and the crops
+    of ${tribe.title()} are suffering for it. It looks as though there will not be a harvest this year.`;
+  }
+
+  static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+    let outcomeMessages : string[] = []
+
+    if (tribe.hasCulture("disastersArePunishment")) {
+      outcomeMessages.push(
+        `The tribe sees this as a sign of your displeasure.
+        They begin praying in the hope that it will alleviate the drought,
+        but it does not.`);
+    }
+    else {
+      outcomeMessages.push(
+        `The tribe sees this as some kind of punishment, but for what, they are not sure.`);
+    }
+
+    outcomeMessages.push(`The tribe moves on from the region, leaving their farms behind.`);
+    outcomeMessages.push(`The tribe abandons agriculture, and transitions back to a hunter-gatherer society.`);
+
+    return outcomeMessages;
+  }
+
+  static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {
+    return [
+      function () {
+        // 20% chance for tribe to become superstitious,
+        // 80% chance for tribe to become fearful.
+        // Tribe gains the 'disasters are punishment' culture.
+        if (Random.chance(0.2)) {
+          tribe.attitudes.monolith = Attitudes.Monolith.Superstitious;
+        }
+        else {
+          tribe.attitudes.monolith = Attitudes.Monolith.Fearful;
+        }
+
+        tribe.addCulture("disastersArePunishment");
+
+        // Tribe population reduced by 60-90%.
+        const currentPopulation : number = tribe.population();
+        const lowerLimit = Math.floor(currentPopulation*0.6);
+        const upperLimit = Math.floor(currentPopulation*0.9);
+
+        tribe.decreasePopulation(Random.interval(lowerLimit, upperLimit));
+
+        console.log(`New population: ${tribe.population()}`);
+      },
+      function () {
+        // Tribe migrates to another region.
+        let otherRegions = region.nearby();
+
+        let migrateRegion : Region = Random.choice(otherRegions);
+
+        region.removeTribe(tribe);
+        migrateRegion.addTribe(tribe);
+
+        // Tribe population reduced by 60-90%.
+        const currentPopulation : number = tribe.population();
+        const lowerLimit = Math.floor(currentPopulation*0.6);
+        const upperLimit = Math.floor(currentPopulation*0.9);
+
+        tribe.decreasePopulation(Random.interval(lowerLimit, upperLimit));
+
+        console.log(`New population: ${tribe.population()}`);
+      },
+      function () {
+        // Tribe abandons agriculture.
+        tribe.addCulture("abandonedAgriculture");
+        tribe.removeTechnology("agriculture");
+
+        // Tribe population reduced by 60-90%.
+        const currentPopulation : number = tribe.population();
+        const lowerLimit = Math.floor(currentPopulation*0.6);
+        const upperLimit = Math.floor(currentPopulation*0.9);
+
+        tribe.decreasePopulation(Random.interval(lowerLimit, upperLimit));
+
+        console.log(`New population: ${tribe.population()}`);
+      }
+    ];
+  }
+}
+
 class FirstStoriesEvent {
   public static id : string = "FirstStoriesEvent";
 
@@ -801,6 +918,7 @@ let TribeEvents : TribeEvent[] = [
   TribeWorshipsMonolithEvent,
   TribeBuildsTempleEvent,
   FireSpreadsEvent,
+  DroughtEvent,
   FirstStoriesEvent,
   OralHistoryEvent,
   PriestClassEvent,

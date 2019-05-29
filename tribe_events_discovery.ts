@@ -296,6 +296,9 @@ class DiscoverFireEvent {
       if (tribe.hasTechnology("agriculture")) return false;
       if (tribe.population() < 200) return false;
       if (!tribe.hasTechnology("tools")) return false;
+
+      // If the tribe has already abandoned agriculture in the past, this event cannot trigger.
+      if (tribe.hasCulture("abandonedAgriculture")) return false;
   
       let c : number = 0.000001;
 
@@ -316,6 +319,8 @@ class DiscoverFireEvent {
       if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return 0;
       if (tribe.population() < 200) return 0;
       if (!tribe.hasTechnology("tools")) return 0;
+
+      if (tribe.hasCulture("abandonedAgriculture")) return 0;
   
       if (region.food() > 4) return Random.interval(1, 5);
       else if (region.food() > 2) return Random.interval(-1, 4);
