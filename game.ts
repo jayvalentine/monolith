@@ -176,6 +176,7 @@ class Game {
     else {
       // Initialise population count to 0.
       let populationCount : number = 0;
+      let tribesCount : number = 0;
 
       // See if any region events trigger.
       for (let region of this.regions) {
@@ -192,6 +193,7 @@ class Game {
           // If the tribe has been encountered, add its population to the total.
           if (tribe.attitudes.monolith != Attitudes.Monolith.Unencountered) {
             populationCount += tribe.population();
+            tribesCount++;
           }
 
           let triggered : boolean = false;
@@ -251,9 +253,7 @@ class Game {
         populationString = `${populationCount}`;
       }
 
-      $("#GameDate").text(`Year ${Math.floor(this.day / 276)}, Day ${this.day % 276}. Population ${populationString} (Encountered).`);
-
-      console.log(`Day ${this.day}`);
+      $("#GameDate").text(`Year ${Math.floor(this.day / 276)}, Day ${this.day % 276}. Population ${populationString}, ${tribesCount} Tribes (Encountered).`);
     }
   }
 
