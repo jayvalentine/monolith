@@ -1,5 +1,6 @@
 /// <reference path="./random.ts">
 /// <reference path="./tribe_events.ts">
+/// <reference path="./language.ts">
 
 // A tribe is a group of people with common traits.
 class Tribe {
@@ -12,7 +13,8 @@ class Tribe {
   private _technology : string[];
   private _culture : string[];
 
-  private _name : string;
+  private _name : Noun[];
+  private _language : Language;
 
   public attitudes: Attitudes;
 
@@ -26,7 +28,7 @@ class Tribe {
     this._technology = [];
     this._culture = [];
 
-    this._name = "";
+    this._name = [];
 
     this.attitudes = new Attitudes();
 
@@ -84,6 +86,47 @@ class Tribe {
     // Increase population by growth count and decrease by death count.
     this.increasePopulation(growthCount);
     this.decreasePopulation(deathCount);
+  }
+
+  // Splits the tribe into multiple groups according to the proportions given.
+  // Returns a list of the new tribes (excluding the original).
+  split(proportions: number[]) : Tribe[] {
+    let populations : number[] = [];
+    let newTribes : Tribe[] = [];
+
+    for (let p of proportions) {
+      populations.push(Math.floor(this._population*p));
+    }
+
+    for (let p of populations.slice(1)) {
+      let t : Tribe = new Tribe(p);
+
+      // Set attitudes of the new tribe to the same as this one.
+      t.attitudes.monolith = this.attitudes.monolith;
+      t.attitudes.others = this.attitudes.others;
+      t.attitudes.world = this.attitudes.world;
+      t.attitudes.self = this.attitudes.self;
+
+      // Set technology and culture of new tribe.
+      for (let tech of this._technology) {
+        t.addTechnology(tech);
+      }
+
+      for (let cult of this._culture) {
+        t.addCulture(cult);
+      }
+
+      // Set migration chance of new tribe.
+      t.setMigrationChance(this._migrationChance);
+
+      newTribes.push(t);
+    }
+
+    // Reduce this tribe's population to the first proportion.
+    this._population = Math.floor(proportions[0] * this._population);
+
+    // Return the new tribes.
+    return newTribes;
   }
 
   attack() : number {
@@ -160,17 +203,29 @@ class Tribe {
   }
 
   title() : string {
-    if (this._name == "") return "a tribe";
-    else return "the " + this._name;
+    if (this._name.length == 0) return "a tribe";
+    else return "the " + Language.toTitle(this._language.translate(this._name));
   }
 
   titleCapitalized() : string {
-    if (this._name == "") return "A tribe";
-    else return "The " + this._name;
+    if (this._name.length == 0) return "A tribe";
+    else return "The " + Language.toTitle(this._language.translate(this._name));
   }
 
-  setName(name: string) {
+  setName(name: Noun[]) {
     this._name = name;
+  }
+
+  name() : Noun[] {
+    return this._name;
+  }
+
+  setLanguage(language: Language) {
+    this._language = language;
+  }
+
+  language() : Language {
+    return this._language;
   }
 
   private growthRate() : number {

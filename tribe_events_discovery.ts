@@ -244,7 +244,8 @@ class DiscoverFireEvent {
       return [
         function () {
           tribe.addTechnology("language");
-          tribe.setName(Language.toTitle(language.translate(tribeName)));
+          tribe.setName(tribeName);
+          tribe.setLanguage(language);
           console.log(`A tribe has discovered language.`);
         }
       ];

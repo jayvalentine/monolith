@@ -708,12 +708,138 @@ class PriestClassEvent {
   }
 }
 
+class GroupBreaksAwayFromInsularTribeEvent {
+  public static id : string = "GroupBreaksAwayFromInsularTribeEvent";
+
+  private static newTribeName : Noun[];
+
+  static triggers(tribe: Tribe, region: Region, progress: number) {
+    // Does not trigger if:
+    // Tribe is not insular.
+    // Tribe is explorative.
+    // Tribe has not been encountered.
+    // Tribe has the 'no outside contact' culture.
+    if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return false;
+    if (tribe.attitudes.others != Attitudes.Others.Insular) return false;
+    if (tribe.attitudes.world == Attitudes.World.Explore) return false;
+    if (tribe.hasCulture("noOutsideContact")) return false;
+
+    return Random.chance(0.0005);
+  }
+
+  static progress(tribe: Tribe, region: Region) : number {
+    return 0;
+  }
+
+  static isChoice() : boolean {
+    return true;
+  }
+
+  static choices() : string[] {
+    return [
+      "They should not be allowed to leave.",
+      "They can explore the world if they wish."
+    ];
+  }
+
+  static choicePrompt(tribe: Tribe) : string {
+    return `A small group from ${tribe.title()} are unhappy with the tribe's insular nature,
+    and have decided they want to break away and form their own tribe. Many of the other tribe members
+    are unhappy with the group's choice, fearing that they will come to harm if they leave.`;
+  }
+
+  static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+    let newName : Noun[] = []
+
+    // Set name of new tribe if the old tribe has one.
+    if (tribe.name().length > 0) {
+      // Get descriptor for tribe.
+      const roll = Random.interval(0, 4);
+      let descriptor : string;
+      switch (roll) {
+        case 0: descriptor = "exile"; break;
+        case 1: descriptor = "fugitive"; break;
+        case 2: descriptor = "displaced"; break;
+        case 3: descriptor = "rejected"; break;
+        case 4: descriptor = "outcast"; break;
+      }
+
+      // Build up the new name.
+      
+      let first : boolean = true;
+      for (let n of tribe.name()) {
+        if (first) {
+          newName.push(new Noun(n.base, n.plural, true, n.adjectives));
+        }
+        else {
+          newName.push(new Noun(n.base, n.plural, n.genitive, n.adjectives));
+        }
+      }
+
+      newName = [new Noun(descriptor, true, false, [])].concat(newName);
+    }
+
+    GroupBreaksAwayFromInsularTribeEvent.newTribeName = newName;
+
+    if (newName.length > 0) {
+      return [
+        `The small group is forced to stay against their will. Knowing that there is no way to overpower the
+        will of the others, they resign themselves to life in the tribe. The tribe avoids contact with the outside world,
+        fearing that otherwise this will happen again.`,
+        `The rest of the tribe is unhappy, but ultimately willing to let the group forge their own path.
+        The new tribe calls themselves ${Language.toTitle(tribe.language().translate(newName))}.`
+      ];
+    }
+    else {
+      return [
+        `The small group is forced to stay against their will. Knowing that there is no way to overpower the
+        will of the others, they resign themselves to life in the tribe. The tribe avoids contact with the outside world,
+        fearing that otherwise this will happen again.`,
+        `The rest of the tribe is unhappy, but ultimately willing to let the group forge their own path.`
+      ];
+    }
+  }
+
+  static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {
+    const newName : Noun[] = GroupBreaksAwayFromInsularTribeEvent.newTribeName;
+
+    return [
+      function () {
+        tribe.addCulture("noOutsideContact");
+      },
+      function () {
+        let newTribe : Tribe = tribe.split([0.8, 0.2])[0];
+
+        // Set the new tribe's name if it has one.
+        if (newName.length > 0) {
+          newTribe.setName(newName);
+        }
+
+        // New tribe is diplomatic and explorative.
+        newTribe.attitudes.others = Attitudes.Others.Diplomatic;
+        newTribe.attitudes.world = Attitudes.World.Explore;
+
+        // Set new tribe's migration chance.
+        newTribe.setMigrationChance(0.00001);
+
+        // New tribe migrates to another region.
+        let otherRegions = region.nearby();
+
+        let migrateRegion : Region = Random.choice(otherRegions);
+
+        migrateRegion.addTribe(newTribe);
+      }
+    ];
+  }
+}
+
 let TribeEvents : TribeEvent[] = [
   TribeDestroyedEvent,
   EncounterEvent,
   IndirectEncounterEvent,
   TribeWorshipsMonolithEvent,
   TribeBuildsTempleEvent,
+  GroupBreaksAwayFromInsularTribeEvent,
   FireSpreadsEvent,
   DroughtEvent,
   PlagueEvent,
