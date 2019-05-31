@@ -296,6 +296,8 @@ class AttackEvent {
 class MigrationEvent {
   public static readonly id : string = "MigrationEvent";
 
+  private static migrateRegion : Region;
+
   static triggers(tribe: Tribe, region: Region, progress: number) {
     return tribe.migrate();
   }
@@ -317,19 +319,24 @@ class MigrationEvent {
   }
 
   static outcomeMessages(tribe: Tribe, region: Region) : string[] {
-    return [""];
+    let otherRegions = region.nearby();
+    MigrationEvent.migrateRegion = Random.choice(otherRegions);
+
+    if (tribe.attitudes.monolith != Attitudes.Monolith.Unencountered) {
+      return [
+        `${tribe.titleCapitalized()} has migrated from a ${region.typeDescription()} region to
+        a ${MigrationEvent.migrateRegion.typeDescription()} region.`
+      ];
+    }
+    else return [""];
   }
 
   static outcomeFunctions(tribe: Tribe, region: Region) {
+    const migrateRegion = MigrationEvent.migrateRegion;
+
     return [function () {
-      let otherRegions = region.nearby();
-
-      let migrateRegion : Region = Random.choice(otherRegions);
-
       region.removeTribe(tribe);
       migrateRegion.addTribe(tribe);
-
-      let attitude : string = Attitudes.MonolithString(tribe.attitudes.monolith);
 
       console.log(`${tribe.title()} has migrated from ${region.typeString()} to ${migrateRegion.typeString()}.`)
     }];
