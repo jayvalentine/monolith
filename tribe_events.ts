@@ -175,14 +175,31 @@ class AttackEvent {
   private static defender : Tribe;
 
   static triggers(tribe: Tribe, region: Region, progress: number) : boolean {
-    if (tribe.attitudes.others != Attitudes.Others.Aggressive) return false;
+    let c : number = 0.0001;
+    if (tribe.attitudes.others == Attitudes.Others.Aggressive) c = 0.0002;
 
     // Are there any other tribes in this region?
     let otherTribes : Tribe[] = region.tribes().filter(function (value, index, array) {return value != tribe});
+
+    // Defensive tribes will attack if relationship is -1 or lower.
+    // Any other non-aggressive tribe will attack if -2 or lower.
+    if (tribe.attitudes.others == Attitudes.Others.Defensive) {
+      otherTribes = otherTribes.filter(function (v, i, a) {return tribe.relationship(v) <= -1;});
+    }
+    else if (tribe.attitudes.others != Attitudes.Others.Aggressive) {
+      otherTribes = otherTribes.filter(function (v, i, a) {return tribe.relationship(v) <= -2;});
+    }
+
     if (otherTribes.length == 0) return false;
 
     // Triggers with chance 0.0001.
-    return Random.chance(0.0001);
+    if (Random.chance(c)) {
+      AttackEvent.defender = Random.choice(otherTribes);
+      return true;
+    }
+    else {
+      return false;
+    }
   }
 
   static progress(tribe: Tribe, region: Region) : number {
@@ -204,14 +221,10 @@ class AttackEvent {
   static outcomeMessages(tribe: Tribe, region: Region) : string[] {
     let attacker : Tribe = tribe;
 
-    // Randomly select a defender.
-    let otherTribes = region.tribes().filter(function (value, index, array) {return value != tribe});
-    AttackEvent.defender = Random.choice(otherTribes);
+    const attackerRoll : number = (Random.interval(1, 10) + attacker.attack()) * Math.floor(attacker.population()*0.1);
+    const defenderRoll : number = (Random.interval(1, 10) + AttackEvent.defender.defense()) * Math.floor(AttackEvent.defender.population()*0.1);
 
-    const attackerRoll : number = Random.interval(1, 10) + attacker.attack();
-    const defenderRoll : number = Random.interval(1, 10) + AttackEvent.defender.defense();
-
-    AttackEvent.outcome = ((attackerRoll - defenderRoll) * 10) + Random.interval(-5, 5);
+    AttackEvent.outcome = (attackerRoll - defenderRoll);
   
     // Silent message if none of the tribes involved have been encountered.
     if ((attacker.attitudes.monolith == Attitudes.Monolith.Unencountered)
