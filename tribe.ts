@@ -1,6 +1,7 @@
 /// <reference path="./random.ts">
 /// <reference path="./tribe_events.ts">
 /// <reference path="./language.ts">
+/// <reference path="./idallocator.ts">
 
 // A tribe is a group of people with common traits.
 class Tribe {
@@ -16,14 +17,22 @@ class Tribe {
   private _name : Noun[];
   private _language : Language;
 
+  private _relations : Object;
+
   public attitudes: Attitudes;
 
   public dead : boolean;
 
+  public readonly id : string;
+
   constructor(population: number) {
+    this.id = IDAllocator.allocate("tribe");
+
     this._population = population;
     this._migrationChance = 0.000001;
     this._eventProgress = {};
+
+    this._relations = {};
 
     this._technology = [];
     this._culture = [];
@@ -54,6 +63,8 @@ class Tribe {
       Attitudes.Self.Hierarchical,
       Attitudes.Self.Egalitarian
     ])
+
+    this._language = new Language();
   }
 
   population() : number {
@@ -127,6 +138,24 @@ class Tribe {
 
     // Return the new tribes.
     return newTribes;
+  }
+
+  relationship(tribe: Tribe) : number {
+    if (!this._relations.hasOwnProperty(tribe.id)) {
+      return 0;
+    }
+
+    return this._relations[tribe.id];
+  }
+
+  changeRelationship(tribe: Tribe, value: number) {
+    if (!this._relations.hasOwnProperty(tribe.id)) {
+      this._relations[tribe.id] = 0;
+    }
+
+    this._relations[tribe.id] += value;
+
+    console.log(`Set relationship of ${this.id} for ${tribe.id} to ${this._relations[tribe.id]}.`);
   }
 
   attack() : number {
@@ -218,10 +247,6 @@ class Tribe {
 
   name() : Noun[] {
     return this._name;
-  }
-
-  setLanguage(language: Language) {
-    this._language = language;
   }
 
   language() : Language {

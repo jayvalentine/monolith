@@ -332,7 +332,6 @@ class TribeWorshipsMonolithEvent {
 
     // This event does not trigger if the tribe already worships the monolith.
     if (tribe.hasCulture("worshipsMonolith")) {
-      console.log("Not triggered because tribe already worships monolith.");
       return false;
     }
 
@@ -833,6 +832,195 @@ class GroupBreaksAwayFromInsularTribeEvent {
   }
 }
 
+class DiplomaticEnvoyEvent {
+  public static id : string = "DiplomaticEnvoyEvent";
+
+  private static otherTribe : Tribe;
+
+  static triggers(tribe: Tribe, region: Region, progress: number) {
+    // Does not trigger if:
+    // Tribe is not diplomatic.
+    // Tribe has not been encountered.
+    // Tribe doesn't have language.
+    if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return false;
+    if (tribe.attitudes.others != Attitudes.Others.Diplomatic) return false;
+    if (!tribe.hasTechnology("language")) return false;
+
+    // Only triggers if there is another tribe in the region with language.
+    let otherTribes : Tribe[] = region.tribes().filter(function (v, i, a) {
+      return (v != tribe) && (v.hasTechnology("language")) && (tribe.relationship(v) == 0);
+    });
+
+    if (otherTribes.length == 0) return false;
+
+    // Select the other tribe to be the target of the envoy.
+    if (Random.chance(0.0005)) {
+      DiplomaticEnvoyEvent.otherTribe = Random.choice(otherTribes);
+      return true;
+    }
+    else return false;
+  }
+
+  static progress(tribe: Tribe, region: Region) : number {
+    return 0;
+  }
+
+  static isChoice() : boolean {
+    return true;
+  }
+
+  static choices() : string[] {
+    const other = DiplomaticEnvoyEvent.otherTribe;
+
+    // If other tribe is aggressive, they attack the envoy.
+    // If other tribe is defensive, increase in relationship.
+    // If other tribe is diplomatic, large increase in relationship.
+    // If other tribe is insular, nothing happens.
+    if (other.attitudes.others == Attitudes.Others.Aggressive) {
+      return [
+        "The dead must be avenged.",
+        "The aggressors should be avoided."
+      ]
+    }
+    else if (other.attitudes.others == Attitudes.Others.Defensive) {
+      return [
+        "They would make valuable allies.",
+        "They should be left in peace."
+      ]
+    }
+    else if (other.attitudes.others == Attitudes.Others.Diplomatic) {
+      return [
+        "They would make valuable friends.",
+        "Their kindness is appreciated."
+      ]
+    }
+    else {
+      return [
+        "How dare they reject the envoys?",
+        "Their isolation should be respected."
+      ]
+    }
+  }
+
+  static choicePrompt(tribe: Tribe) : string {
+    const other = DiplomaticEnvoyEvent.otherTribe;
+
+    let message : string = `${tribe.titleCapitalized()} has decided to send a small group of envoys to a nearby tribe,
+    ${other.title()}, in the hopes of getting to know them better. A group of tribespeople leave one morning,
+    bearing gifts for their neighbours.`;
+
+    if (other.attitudes.others == Attitudes.Others.Aggressive) {
+      message += ` ${other.titleCapitalized()} are aggressive toward the envoys. Shortly after arriving in their camp,
+      they are all brutally killed.`;
+    }
+    else if (other.attitudes.others == Attitudes.Others.Defensive) {
+      message += ` ${other.titleCapitalized()} seem suspicious of the envoys. They are allowed to enter the camp,
+      and after a short while the tribe realizes that they mean no harm. The gifts seem appreciated, and the envoys
+      return to their home.`;
+    }
+    else if (other.attitudes.others == Attitudes.Others.Diplomatic) {
+      message += ` ${other.titleCapitalized()} are welcoming of the envoys, and seem pleased to have met another tribe.
+      The gifts are greatly appreciated, and the envoys return to their home. A few days later, a group of envoys from
+      ${other.title()} arrive at the camp of ${tribe.title()}, bearing gifts in return.`;
+    }
+    else {
+      message += ` ${other.titleCapitalized()} are deeply suspicious of the envoys, refusing to allow them anywhere near
+      the camp. The envoys are disappointed, but decide it is better to leave in peace than risk provoking anyone.`;
+    }
+
+    return message;
+  }
+
+  static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+    const other = DiplomaticEnvoyEvent.otherTribe;
+
+    if (other.attitudes.others == Attitudes.Others.Aggressive) {
+      return [
+        `${tribe.titleCapitalized()} are angry at the loss of their envoys, and the tribespeople swear
+        that their deaths shall be avenged.`,
+        `${tribe.titleCapitalized()} are angry at the loss of their envoys, but realise that to escalate
+        the conflict would only result in further deaths.`
+      ];
+    }
+    else if (other.attitudes.others == Attitudes.Others.Defensive) {
+      return [
+        `${tribe.titleCapitalized()} are pleased to have made contact with ${other.title()},
+        and decide that it would be good to further improve their relations.`,
+        `${tribe.titleCapitalized()} are pleased to have made contact with ${other.title()},
+        but decide it would be better if they were left in peace.`
+      ];
+    }
+    else if (other.attitudes.others == Attitudes.Others.Diplomatic) {
+      return [
+        `${tribe.titleCapitalized()} are pleased to have made contact with ${other.title()},
+        and both tribes decide that they would like to improve their relations.`,
+        `${tribe.titleCapitalized()} appreciate the kindness of ${other.title()}, and are
+        glad to know of other tribes that have the same views as them.`
+      ];
+    }
+    else {
+      return [
+        `${tribe.titleCapitalized()} are offended at their envoys being rejected.`,
+        `${tribe.titleCapitalized()} are disappointed at their envoys being rejected, but
+        decide that it is better to leave ${other.title()} in peace.`
+      ];
+    }
+  }
+
+  static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {
+    const other = DiplomaticEnvoyEvent.otherTribe;
+
+    if (other.attitudes.others == Attitudes.Others.Aggressive) {
+      return [
+        function () {
+          tribe.changeRelationship(other, -2);
+          other.changeRelationship(tribe, -2);
+        },
+        function () {
+          tribe.changeRelationship(other, -1);
+          other.changeRelationship(tribe, -1);
+        }
+      ];
+    }
+    else if (other.attitudes.others == Attitudes.Others.Defensive) {
+      return [
+        function () {
+          tribe.changeRelationship(other, 2);
+          other.changeRelationship(tribe, 2);
+        },
+        function () {
+          tribe.changeRelationship(other, 1);
+          other.changeRelationship(tribe, 1);
+        }
+      ];
+    }
+    else if (other.attitudes.others == Attitudes.Others.Diplomatic) {
+      return [
+        function () {
+          tribe.changeRelationship(other, 3);
+          other.changeRelationship(tribe, 3);
+        },
+        function () {
+          tribe.changeRelationship(other, 2);
+          other.changeRelationship(tribe, 2);
+        }
+      ];
+    }
+    else {
+      return [
+        function () {
+          tribe.changeRelationship(other, -2);
+          other.changeRelationship(tribe, -2);
+        },
+        function () {
+          tribe.changeRelationship(other, -1);
+          other.changeRelationship(tribe, -1);
+        }
+      ];
+    }
+  }
+}
+
 let TribeEvents : TribeEvent[] = [
   TribeDestroyedEvent,
   EncounterEvent,
@@ -840,6 +1028,7 @@ let TribeEvents : TribeEvent[] = [
   TribeWorshipsMonolithEvent,
   TribeBuildsTempleEvent,
   GroupBreaksAwayFromInsularTribeEvent,
+  DiplomaticEnvoyEvent,
   FireSpreadsEvent,
   DroughtEvent,
   PlagueEvent,

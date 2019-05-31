@@ -184,8 +184,7 @@ class DiscoverFireEvent {
   
   class DiscoverLanguageEvent {
     public static readonly id : string = "DiscoverLanguageEvent";
-  
-    private static language : Language;
+
     private static tribeName : Noun[];
   
     static triggers(tribe: Tribe, region: Region, progress: number) : boolean {
@@ -227,25 +226,21 @@ class DiscoverFireEvent {
     }
   
     static outcomeMessages(tribe: Tribe, region: Region) : string[] {
-      DiscoverLanguageEvent.language = new Language();
-
       DiscoverLanguageEvent.tribeName = DiscoverLanguageEvent.generateTribeName(tribe, region);
 
       return [
         `You notice that a tribe seems to be using a more advanced form of communication.
         As your language coprocessor engages, you discover that they now call themselves the
-        ${Language.toTitle(DiscoverLanguageEvent.language.translate(DiscoverLanguageEvent.tribeName))}.`
+        ${Language.toTitle(tribe.language().translate(DiscoverLanguageEvent.tribeName))}.`
       ];
     }
   
     static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {
-      const language = DiscoverLanguageEvent.language;
       const tribeName = DiscoverLanguageEvent.tribeName;
       return [
         function () {
           tribe.addTechnology("language");
           tribe.setName(tribeName);
-          tribe.setLanguage(language);
           console.log(`A tribe has discovered language.`);
         }
       ];
