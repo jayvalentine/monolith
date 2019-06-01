@@ -190,43 +190,43 @@ class Game {
         let tribesToRemove : Tribe[] = []
 
         for (let tribe of region.tribes()) {
-          // If the tribe has been encountered, add its population to the total.
-          if (tribe.attitudes.monolith != Attitudes.Monolith.Unencountered) {
-            populationCount += tribe.population();
-            tribesCount++;
-          }
+          if (tribe.dead) tribesToRemove.push(tribe);
+          else {
+            // If the tribe has been encountered, add its population to the total.
+            if (tribe.attitudes.monolith != Attitudes.Monolith.Unencountered) {
+              populationCount += tribe.population();
+              tribesCount++;
+            }
 
-          let triggered : boolean = false;
+            let triggered : boolean = false;
 
-          for (let tribeEvent of TribeEvents) {
-            // If this tribe event triggers on this tribe, queue a message or a choice.
-            if (!triggered && tribeEvent.triggers(tribe, region, tribe.progress(tribeEvent))) {
-              // Reset progress towards the event.
-              tribe.resetProgress(tribeEvent);
+            for (let tribeEvent of TribeEvents) {
+              // If this tribe event triggers on this tribe, queue a message or a choice.
+              if (!triggered && tribeEvent.triggers(tribe, region, tribe.progress(tribeEvent))) {
+                // Reset progress towards the event.
+                tribe.resetProgress(tribeEvent);
 
-              if (tribeEvent.isChoice()) {
-                this.queueMessage(tribeEvent.choicePrompt(tribe), function () {});
-                this.queueChoice(tribeEvent.choices(),
-                                 tribeEvent.outcomeMessages(tribe, region),
-                                 tribeEvent.outcomeFunctions(tribe, region));
+                if (tribeEvent.isChoice()) {
+                  this.queueMessage(tribeEvent.choicePrompt(tribe), function () {});
+                  this.queueChoice(tribeEvent.choices(),
+                                  tribeEvent.outcomeMessages(tribe, region),
+                                  tribeEvent.outcomeFunctions(tribe, region));
+                }
+                else {
+                  // If the event is not a choice, we can safely assume it has exactly one outcome.
+                  this.queueMessage(tribeEvent.outcomeMessages(tribe, region)[0],
+                                    tribeEvent.outcomeFunctions(tribe, region)[0]);
+                }
+
+                triggered = true;
               }
               else {
-                // If the event is not a choice, we can safely assume it has exactly one outcome.
-                this.queueMessage(tribeEvent.outcomeMessages(tribe, region)[0],
-                                  tribeEvent.outcomeFunctions(tribe, region)[0]);
+                tribe.increaseProgress(tribeEvent, tribeEvent.progress(tribe, region));
               }
+            }
 
-              triggered = true;
-            }
-            else {
-              tribe.increaseProgress(tribeEvent, tribeEvent.progress(tribe, region));
-            }
+            tribe.grow();
           }
-
-          // Add the tribe to the list of tribes to be removed if it is dead.
-          // Otherwise process the tribe's growth.
-          if (tribe.dead) tribesToRemove.push(tribe);
-          else tribe.grow();
         }
 
         // Remove all the dead tribes.
