@@ -421,6 +421,109 @@ class TribeWorshipsMonolithEvent {
   }
 }
 
+class TribeCuriousOfMonolithEvent {
+  public static id : string = "TribeCuriousOfMonolithEvent";
+
+  static triggers(tribe: Tribe, region: Region, progress: number) {
+    if (tribe.attitudes.monolith != Attitudes.Monolith.Curious) return false;
+    if (!region.hasMonolith) return false;
+
+    // This event does not trigger if the tribe already worships the monolith.
+    if (tribe.hasCulture("curiousOfMonolith")) {
+      return false;
+    }
+
+    return Random.progressiveChance(0.0001, progress, 0.1);
+  }
+
+  static progress(tribe: Tribe, region: Region) : number {
+    return Random.interval(0, 2);
+  }
+
+  static isChoice() : boolean {
+    return true;
+  }
+
+  static choices() : string[] {
+    return [
+      "I am merely a machine.",
+      "They should not be so curious."
+    ];
+  }
+
+  static choicePrompt(tribe: Tribe) : string {
+    return `You notice that members of ${tribe.title()} have been observing you cautiously since your landing.
+    Every now and then some of them visit you, studying your metal exterior. They are obviously wondering what
+    exactly you are.`;
+  }
+
+  static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+    return [
+      `The tribe doesn't understand, but seems even more curious about you now.`,
+      `The tribe is afraid, and stops visiting you.`
+    ];
+  }
+
+  static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {
+    return [
+      function () {
+        tribe.addCulture("curiousOfMonolith");
+      },
+      function () {
+        tribe.attitudes.monolith = Attitudes.Monolith.Fearful;
+      }
+    ];
+  }
+}
+
+class TribeFearsMonolithEvent {
+  public static id : string = "TribeFearsMonolithEvent";
+
+  static triggers(tribe: Tribe, region: Region, progress: number) {
+    if (tribe.attitudes.monolith != Attitudes.Monolith.Fearful) return false;
+    if (!region.hasMonolith) return false;
+
+    // This event does not trigger if the tribe already worships the monolith.
+    if (tribe.hasCulture("fearsMonolith")) {
+      return false;
+    }
+
+    return Random.progressiveChance(0.0001, progress, 0.1);
+  }
+
+  static progress(tribe: Tribe, region: Region) : number {
+    return Random.interval(0, 2);
+  }
+
+  static isChoice() : boolean {
+    return false;
+  }
+
+  static choices() : string[] {
+    return [];
+  }
+
+  static choicePrompt(tribe: Tribe) : string {
+    return "";
+  }
+
+  static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+    return [
+      `Members of ${tribe.title()} are taking turns observing you while the rest of the tribe
+      sleeps. They are very clearly afraid of you.`
+    ];
+  }
+
+  static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {
+    return [
+      function () {
+        tribe.addCulture("fearsMonolith");
+      }
+    ];
+  }
+}
+
+
 class TribeBuildsTempleEvent {
   public static id : string = "TribeBuildsTempleEvent";
 
@@ -1046,6 +1149,8 @@ let TribeEvents : TribeEvent[] = [
   EncounterEvent,
   IndirectEncounterEvent,
   TribeWorshipsMonolithEvent,
+  TribeCuriousOfMonolithEvent,
+  TribeFearsMonolithEvent,
   TribeBuildsTempleEvent,
   GroupBreaksAwayFromInsularTribeEvent,
   DiplomaticEnvoyEvent,
