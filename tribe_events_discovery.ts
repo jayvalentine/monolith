@@ -190,11 +190,11 @@ class DiscoverFireEvent {
     static triggers(tribe: Tribe, region: Region, progress: number) : boolean {
       // Can't trigger if:
       // Tribe is unencountered
-      // Tribe population is < 100
+      // Tribe population is < 80
       // Tribe already has language
       if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return false;
       if (tribe.hasTechnology("language")) return false;
-      if (tribe.population() < 100) return false;
+      if (tribe.population() < 80) return false;
   
       let c : number = 0.000001;
       if (tribe.attitudes.others == Attitudes.Others.Diplomatic) c = 0.000002;
@@ -205,10 +205,10 @@ class DiscoverFireEvent {
     static progress(tribe: Tribe, region: Region) : number {
       // Can't progress if:
       // Tribe is unencountered
-      // Tribe population is < 100
+      // Tribe population is < 80
       if (tribe.hasTechnology("language")) return 0;
       if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return 0;
-      if (tribe.population() < 100) return 0;
+      if (tribe.population() < 80) return 0;
   
       return Random.interval(0, 3);
     }
