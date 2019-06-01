@@ -1507,6 +1507,81 @@ class TribeCelebratesMonolithEvent {
   }
 }
 
+class WarlordsTakePowerEvent {
+  public static id : string = "WarlordsTakePowerEvent";
+
+  static triggers(tribe: Tribe, region: Region, progress: number) {
+    // Does not trigger if:
+    // Tribe is not aggressive
+    // Tribe is not hierarchical
+    // Tribe has < 150 population
+    // Tribe has not been encountered
+    if (tribe.attitudes.others != Attitudes.Others.Aggressive) return false;
+    if (tribe.attitudes.self != Attitudes.Self.Hierarchical) return false;
+    if (tribe.population() < 150) return false;
+    if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return false;
+
+    if (tribe.hasCulture("warlordsRule")) return false;
+
+    return Random.progressiveChance(0.00001, progress, 0.005);
+  }
+
+  static progress(tribe: Tribe, region: Region) : number {
+    // Does not trigger if:
+    // Tribe is not aggressive
+    // Tribe is not hierarchical
+    // Tribe has < 150 population
+    // Tribe has not been encountered
+    if (tribe.attitudes.others != Attitudes.Others.Aggressive) return 0;
+    if (tribe.attitudes.self != Attitudes.Self.Hierarchical) return 0;
+    if (tribe.population() < 150) return 0;
+    if (tribe.attitudes.monolith == Attitudes.Monolith.Unencountered) return 0;
+
+    if (tribe.hasCulture("warlordsRule")) return 0;
+
+    return 1;
+  }
+
+  static isChoice() : boolean {
+    return true;
+  }
+
+  static choices(tribe: Tribe) : string[] {
+    return [
+      "The warlords have no right to rule.",
+      "The warlords are the rightful rulers."
+    ];
+  }
+
+  static choicePrompt(tribe: Tribe) : string {
+    return `A small group of warlords from ${tribe.title()} have decided that they are the tribe's
+    rightful rulers. They have proven themselves on the battlefield and feel that they are most capable of
+    leading the tribe.`;
+  }
+
+  static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+    return [
+      `The tribe attempts to force the warlords out of their settlement, but they refuse, preferring to fight.
+      In the ensuing battle, a number of tribespeople are killed, as are all of the warlords.`,
+      `The warlords take their place as the rightful rulers of the tribe.`
+    ];
+  }
+
+  static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {
+    return [
+      function () {
+        const upperLimit = Math.floor(tribe.population() * 0.3);
+        const lowerLimit = Math.floor(tribe.population() * 0.1);
+        tribe.decreasePopulation(Random.interval(lowerLimit, upperLimit));
+        tribe.attitudes.self = Attitudes.Self.Egalitarian;
+      },
+      function () {
+        tribe.addCulture("warlordsRule");
+      }
+    ];
+  }
+}
+
 let TribeEvents : TribeEvent[] = [
   TribeDestroyedEvent,
   EncounterEvent,
@@ -1527,6 +1602,7 @@ let TribeEvents : TribeEvent[] = [
   FirstStoriesEvent,
   OralHistoryEvent,
   PriestClassEvent,
+  WarlordsTakePowerEvent,
   AttackEvent,
   MigrationEvent,
   DiscoverFireEvent,
