@@ -755,9 +755,87 @@ class TribeAttacksMonolithEvent {
         for (let t of otherTribes) {
           t.changeRelationship(tribe, -2);
         }
+
+        region.addStructure("damagedMonolith");
       },
       function () {
         tribe.attitudes.monolith = Attitudes.Monolith.Curious;
+        region.addStructure("damagedMonolith");
+      }
+    ];
+  }
+}
+
+class TribeRebuildsMonolithEvent {
+  public static id : string = "TribeRebuildsMonolithEvent";
+
+  private static triggered : boolean = false;
+
+  static triggers(tribe: Tribe, region: Region, progress: number) {
+    if (tribe.attitudes.monolith != Attitudes.Monolith.Curious) return false;
+    if (!region.hasMonolith) return false;
+    if (!tribe.hasCulture("curiousOfMonolith")) return false;
+    if (!tribe.hasTechnology("construction")) return false;
+    if (!region.hasStructure("damagedMonolith")) return false;
+    
+    // This event does not trigger if the monolith is already damaged.
+    if (region.hasStructure("rebuiltMonolith")) {
+      return false;
+    }
+
+    // This event only triggers once.
+    if (TribeRebuildsMonolithEvent.triggered) return false;
+
+    if (Random.progressiveChance(0.00001, progress, 0.01)) {
+      TribeRebuildsMonolithEvent.triggered = true;
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  static progress(tribe: Tribe, region: Region) : number {
+    if (tribe.attitudes.monolith != Attitudes.Monolith.Curious) return 0;
+    if (!region.hasMonolith) return 0;
+    if (!tribe.hasCulture("curiousOfMonolith")) return 0;
+    if (!tribe.hasTechnology("construction")) return 0;
+    if (!region.hasStructure("damagedMonolith")) return 0;
+    
+    // This event does not trigger if the monolith is already damaged.
+    if (region.hasStructure("rebuiltMonolith")) {
+      return 0;
+    }
+
+    // This event only triggers once.
+    if (TribeRebuildsMonolithEvent.triggered) return 0;
+
+    return 1;
+  }
+
+  static isChoice() : boolean {
+    return false;
+  }
+
+  static choices() : string[] {
+    return [];
+  }
+
+  static choicePrompt(tribe: Tribe) : string {
+    return "";
+  }
+
+  static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+    return [`${tribe.titleCapitalized()} have begun bringing stone slabs and wooden planks to your
+    landing site. Before long a group of tribespeople are using stone tools to erect a shell
+    around the parts of your surface that were dented in the attack. They seem unhappy to have seen you
+    damaged.`];
+  }
+
+  static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {
+    return [
+      function () {
+        region.addStructure("rebuiltMonolith");
       }
     ];
   }
@@ -1312,6 +1390,7 @@ let TribeEvents : TribeEvent[] = [
   TribeBuildsTempleEvent,
   TribeAsksMonolithPurposeEvent,
   TribeAttacksMonolithEvent,
+  TribeRebuildsMonolithEvent,
   GroupBreaksAwayFromInsularTribeEvent,
   DiplomaticEnvoyEvent,
   FireSpreadsEvent,
