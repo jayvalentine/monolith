@@ -673,6 +673,96 @@ class TribeBuildsTempleEvent {
   }
 }
 
+class TribeAttacksMonolithEvent {
+  public static id : string = "TribeAttacksMonolithEvent";
+
+  private static triggered : boolean = false;
+
+  static triggers(tribe: Tribe, region: Region, progress: number) {
+    if (tribe.attitudes.monolith != Attitudes.Monolith.Fearful) return false;
+    if (!region.hasMonolith) return false;
+    if (!tribe.hasCulture("fearsMonolith")) return false;
+    if (!tribe.hasTechnology("tools")) return false;
+    
+    // This event does not trigger if the monolith is already damaged.
+    if (region.hasStructure("damagedMonolith")) {
+      return false;
+    }
+
+    // This event only triggers once.
+    if (TribeAttacksMonolithEvent.triggered) return false;
+
+    if (Random.progressiveChance(0.00001, progress, 0.01)) {
+      TribeAttacksMonolithEvent.triggered = true;
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
+
+  static progress(tribe: Tribe, region: Region) : number {
+    if (tribe.attitudes.monolith != Attitudes.Monolith.Fearful) return 0;
+    if (!region.hasMonolith) return 0;
+    if (!tribe.hasCulture("fearsMonolith")) return 0;
+    if (!tribe.hasTechnology("tools")) return 0;
+    
+    // This event does not trigger if the monolith is already damaged.
+    if (region.hasStructure("damagedMonolith")) {
+      return 0;
+    }
+
+    // This event only triggers once.
+    if (TribeAttacksMonolithEvent.triggered) return 0;
+
+    return 1;
+  }
+
+  static isChoice() : boolean {
+    return true;
+  }
+
+  static choices() : string[] {
+    return [
+      "They will pay for this.",
+      "I am not a threat to them."
+    ];
+  }
+
+  static choicePrompt(tribe: Tribe) : string {
+    return `A large group of people from ${tribe.title()} have gathered around you.
+    Many of them are carrying large stone hammers, or even simply rocks. They begin to attack
+    your metal exterior with them. You are helpless to respond as they make dents in your surface.
+    Once the attack is over, you find that you are thankfully not seriously damaged.`;
+  }
+
+  static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+    return [
+      `Other tribes in the area seem angry at them for attacking you.`,
+      `The tribe realises that you are not here to harm them, as otherwise you would have responded to their attack.
+      They still seem afraid, but begin to wonder why you are here.`
+    ];
+  }
+
+  static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {
+    // Get list of all other non-fearful tribes in the region.
+    const otherTribes : Tribe[] = region.tribes().filter(function (v, i, a) {
+      return (v != tribe) && (v.attitudes.monolith != Attitudes.Monolith.Fearful);
+    });
+
+    return [
+      function () {
+        for (let t of otherTribes) {
+          t.changeRelationship(tribe, -2);
+        }
+      },
+      function () {
+        tribe.attitudes.monolith = Attitudes.Monolith.Curious;
+      }
+    ];
+  }
+}
+
 class FirstStoriesEvent {
   public static id : string = "FirstStoriesEvent";
 
@@ -1221,6 +1311,7 @@ let TribeEvents : TribeEvent[] = [
   TribeFearsMonolithEvent,
   TribeBuildsTempleEvent,
   TribeAsksMonolithPurposeEvent,
+  TribeAttacksMonolithEvent,
   GroupBreaksAwayFromInsularTribeEvent,
   DiplomaticEnvoyEvent,
   FireSpreadsEvent,
