@@ -523,6 +523,74 @@ class TribeFearsMonolithEvent {
   }
 }
 
+class TribeAsksMonolithPurposeEvent {
+  public static id : string = "TribeAsksMonolithPurposeEvent";
+
+  static triggers(tribe: Tribe, region: Region, progress: number) {
+    if (tribe.attitudes.monolith != Attitudes.Monolith.Curious) return false;
+    if (!region.hasMonolith) return false;
+    if (!tribe.hasCulture("curiousOfMonolith")) return false;
+    if (!tribe.hasTechnology("language")) return false;
+
+    if (tribe.hasCulture("touchedByAliens")) return false;
+    if (tribe.hasCulture("acceptsMonolith")) return false;
+
+    return Random.progressiveChance(0.00001, progress, 0.05);
+  }
+
+  static progress(tribe: Tribe, region: Region) : number {
+    if (tribe.attitudes.monolith != Attitudes.Monolith.Curious) return 0;
+    if (!region.hasMonolith) return 0;
+    if (!tribe.hasCulture("curiousOfMonolith")) return 0;
+    if (!tribe.hasTechnology("language")) return 0;
+
+    if (tribe.hasCulture("touchedByAliens")) return 0;
+    if (tribe.hasCulture("acceptsMonolith")) return 0;
+
+    return 1;
+  }
+
+  static isChoice() : boolean {
+    return true;
+  }
+
+  static choices() : string[] {
+    return [
+      "I came from another world.",
+      "I am merely a machine.",
+      "I am a part of this world."
+    ];
+  }
+
+  static choicePrompt(tribe: Tribe) : string {
+    return `One day a strange thing happens. A single member of ${tribe.title()} approaches
+    you, and kneels at your base. They place one hand on your metal exterior, and then ask you a question:
+    "What are you, great stone?"`;
+  }
+
+  static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+    return [
+      `The tribesperson is confused, as they do not know that there are other worlds like this one.
+      However, your interaction seems to plant a seed in their mind, as they consider what you just told them.`,
+      `The tribesperson seems to understand - you are like their tools and buildings, only different.`,
+      `The tribesperson seems to understand - you are a natural formation, like the trees and stones around them.`
+    ];
+  }
+
+  static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {
+    return [
+      function () {
+        tribe.addCulture("touchedByAliens");
+      },
+      function () {
+        tribe.addCulture("acceptsMonolith");
+      },
+      function () {
+        tribe.addCulture("acceptsMonolith");
+      }
+    ];
+  }
+}
 
 class TribeBuildsTempleEvent {
   public static id : string = "TribeBuildsTempleEvent";
@@ -1152,6 +1220,7 @@ let TribeEvents : TribeEvent[] = [
   TribeCuriousOfMonolithEvent,
   TribeFearsMonolithEvent,
   TribeBuildsTempleEvent,
+  TribeAsksMonolithPurposeEvent,
   GroupBreaksAwayFromInsularTribeEvent,
   DiplomaticEnvoyEvent,
   FireSpreadsEvent,
