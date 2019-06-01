@@ -20,7 +20,7 @@ class FireSpreadsEvent {
     return true;
   }
 
-  static choices() : string[] {
+  static choices(tribe: Tribe) : string[] {
     return [
       "They are being punished.",
       "This is a learning experience."
@@ -113,7 +113,7 @@ class DroughtEvent {
     return true;
   }
 
-  static choices() : string[] {
+  static choices(tribe: Tribe) : string[] {
     return [
       "They are being punished.",
       "They must leave this barren place.",
@@ -226,7 +226,7 @@ class PlagueEvent {
       return false;
     }
   
-    static choices() : string[] {
+    static choices(tribe: Tribe) : string[] {
       return [];
     }
   

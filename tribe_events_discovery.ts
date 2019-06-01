@@ -30,7 +30,7 @@ class DiscoverFireEvent {
       return true;
     }
   
-    static choices() : string[] {
+    static choices(tribe: Tribe) : string[] {
       return [
         "Fire is useful.",
         "Fire is dangerous."
@@ -95,7 +95,7 @@ class DiscoverFireEvent {
       return false;
     }
   
-    static choices() : string[] {
+    static choices(tribe: Tribe) : string[] {
       return [];
     }
   
@@ -156,7 +156,7 @@ class DiscoverFireEvent {
       return false;
     }
   
-    static choices() : string[] {
+    static choices(tribe: Tribe) : string[] {
       return [];
     }
   
@@ -217,7 +217,7 @@ class DiscoverFireEvent {
       return false;
     }
   
-    static choices() : string[] {
+    static choices(tribe: Tribe) : string[] {
       return [];
     }
   
@@ -327,7 +327,7 @@ class DiscoverFireEvent {
       return false;
     }
   
-    static choices() : string[] {
+    static choices(tribe: Tribe) : string[] {
       return [];
     }
   

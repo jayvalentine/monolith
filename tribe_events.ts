@@ -11,7 +11,7 @@ interface TribeEvent {
 
   isChoice() : boolean;
   choicePrompt(tribe: Tribe) : string;
-  choices() : string[];
+  choices(tribe: Tribe) : string[];
 
   outcomeMessages(tribe: Tribe, region: Region) : string[];
   outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[];
@@ -37,7 +37,7 @@ class EncounterEvent {
     return false;
   }
 
-  static choices() : string[] {
+  static choices(tribe: Tribe) : string[] {
     return [];
   }
 
@@ -95,7 +95,7 @@ class IndirectEncounterEvent {
     return false;
   }
 
-  static choices() : string[] {
+  static choices(tribe: Tribe) : string[] {
     return [];
   }
 
@@ -146,7 +146,7 @@ class TribeDestroyedEvent {
     return false;
   }
 
-  static choices() : string[] {
+  static choices(tribe: Tribe) : string[] {
     return [];
   }
 
@@ -210,7 +210,7 @@ class AttackEvent {
     return false;
   }
 
-  static choices() : string[] {
+  static choices(tribe: Tribe) : string[] {
     return [];
   }
 
@@ -310,7 +310,7 @@ class MigrationEvent {
     return false;
   }
 
-  static choices() : string[] {
+  static choices(tribe: Tribe) : string[] {
     return [];
   }
 
@@ -366,7 +366,7 @@ class TribeWorshipsMonolithEvent {
     return true;
   }
 
-  static choices() : string[] {
+  static choices(tribe: Tribe) : string[] {
     return [
       "I am not their god.",
       "I am their god, and I am good.",
@@ -444,7 +444,7 @@ class TribeCuriousOfMonolithEvent {
     return true;
   }
 
-  static choices() : string[] {
+  static choices(tribe: Tribe) : string[] {
     return [
       "I am merely a machine.",
       "They should not be so curious."
@@ -499,7 +499,7 @@ class TribeFearsMonolithEvent {
     return false;
   }
 
-  static choices() : string[] {
+  static choices(tribe: Tribe) : string[] {
     return [];
   }
 
@@ -554,7 +554,7 @@ class TribeAsksMonolithPurposeEvent {
     return true;
   }
 
-  static choices() : string[] {
+  static choices(tribe: Tribe) : string[] {
     return [
       "I came from another world.",
       "I am merely a machine.",
@@ -632,7 +632,7 @@ class TribeBuildsTempleEvent {
     return true;
   }
 
-  static choices() : string[] {
+  static choices(tribe: Tribe) : string[] {
     return [
       "I am not worthy of their worship.",
       "They are right to revere me."
@@ -667,6 +667,7 @@ class TribeBuildsTempleEvent {
       },
       function () {
         tribe.addCulture("celebratesMonolith");
+        tribe.addCulture("templeBuilders");
         region.addStructure("monolithTemple");
       }
     ];
@@ -722,7 +723,7 @@ class TribeAttacksMonolithEvent {
     return true;
   }
 
-  static choices() : string[] {
+  static choices(tribe: Tribe) : string[] {
     return [
       "They will pay for this.",
       "I am not a threat to them."
@@ -817,7 +818,7 @@ class TribeRebuildsMonolithEvent {
     return false;
   }
 
-  static choices() : string[] {
+  static choices(tribe: Tribe) : string[] {
     return [];
   }
 
@@ -872,7 +873,7 @@ class FirstStoriesEvent {
     return false;
   }
 
-  static choices() : string[] {
+  static choices(tribe: Tribe) : string[] {
     return [];
   }
 
@@ -962,7 +963,7 @@ class OralHistoryEvent {
     return true;
   }
 
-  static choices() : string[] {
+  static choices(tribe: Tribe) : string[] {
     return [
       "The past is not important.",
       "The past should be remembered."
@@ -1029,7 +1030,7 @@ class PriestClassEvent {
     return true;
   }
 
-  static choices() : string[] {
+  static choices(tribe: Tribe) : string[] {
     return [
       "The priests do not speak for me.",
       "The priests are my messengers."
@@ -1093,7 +1094,7 @@ class GroupBreaksAwayFromInsularTribeEvent {
     return true;
   }
 
-  static choices() : string[] {
+  static choices(tribe: Tribe) : string[] {
     return [
       "They should not be allowed to leave.",
       "They can explore the world if they wish."
@@ -1228,7 +1229,7 @@ class DiplomaticEnvoyEvent {
     return true;
   }
 
-  static choices() : string[] {
+  static choices(tribe: Tribe) : string[] {
     const other = DiplomaticEnvoyEvent.otherTribe;
 
     // If other tribe is aggressive, they attack the envoy.
@@ -1380,6 +1381,132 @@ class DiplomaticEnvoyEvent {
   }
 }
 
+class TribeCelebratesMonolithEvent {
+  public static id : string = "TribeCelebratesMonolithEvent";
+
+  static triggers(tribe: Tribe, region: Region, progress: number) {
+    // Does not trigger if:
+    // Tribe is not in same region as the monolith
+    // Tribe does not have the 'celebrates monolith' culture
+    // Tribe does not have language
+    // There is no temple.
+    if (!region.hasMonolith) return false;
+    if (!tribe.hasCulture("celebratesMonolith")) return false;
+    if (!tribe.hasTechnology("language")) return false;
+    if (!region.hasStructure("monolithTemple")) return false;
+
+    // Triggers semi-regularly.
+    if (progress > 400) {
+      return Random.chance(0.05);
+    }
+    else return false;
+  }
+
+  static progress(tribe: Tribe, region: Region) : number {
+    // Does not trigger if:
+    // Tribe is not in same region as the monolith
+    // Tribe does not have the 'celebrates monolith' culture
+    // Tribe does not have language
+    // There is no temple.
+    if (!region.hasMonolith) return 0;
+    if (!tribe.hasCulture("celebratesMonolith")) return 0;
+    if (!tribe.hasTechnology("language")) return 0;
+    if (!region.hasStructure("monolithTemple")) return 0;
+
+    return 1;
+  }
+
+  static isChoice() : boolean {
+    return true;
+  }
+
+  static choices(tribe: Tribe) : string[] {
+    if (tribe.hasCulture("humanSacrifice")) {
+      return [
+        "This is horrible.",
+        "This is a worthy sacrifice."
+      ]
+    }
+    else {
+      return [
+        "Their songs and offerings please me.",
+        "Their songs and offerings are not enough."
+      ];
+    }
+  }
+
+  static choicePrompt(tribe: Tribe) : string {
+    if (tribe.hasCulture("humanSacrifice")) {
+      if (tribe.hasCulture("templeBuilders")) {
+        return `${tribe.titleCapitalized()} have gathered at the temple they built in your name.
+        Many of them have brought offerings to place at your base in the hope that they will be blessed
+        by you. Once all the offerings have been made, they stand in a circle around you and sing songs of worship.
+        After the songs are complete, two of the tribe's priests bring a young man to you.
+        "We offer this sacrifice in the hope that it pleases you, great stone," they say, as they slit the man's throat.`;
+      }
+      else {
+        return `${tribe.titleCapitalized()} has made a pilgramage to your temple.
+        Many of them have brought offerings to place at your base in the hope that they will be blessed
+        by you. Once all the offerings have been made, they stand in a circle around you and sing songs of worship.
+        After the songs are complete, two of the tribe's priests bring a young man to you.
+        "We offer this sacrifice in the hope that it pleases you, great stone," they say, as they slit the man's throat.`;
+      }
+    }
+    else {
+      if (tribe.hasCulture("templeBuilders")) {
+        return `${tribe.titleCapitalized()} have gathered at the temple they built in your name.
+        Many of them have brought offerings to place at your base in the hope that they will be blessed
+        by you. Once all the offerings have been made, they stand in a circle around you and sing songs of worship.`;
+      }
+      else {
+        return `${tribe.titleCapitalized()} has made a pilgramage to your temple.
+        Many of them have brought offerings to place at your base in the hope that they will be blessed
+        by you. Once all the offerings have been made, they stand in a circle around you and sing songs of worship.`;
+      }
+    }
+  }
+
+  static outcomeMessages(tribe: Tribe, region: Region) : string[] {
+    if (tribe.hasCulture("humanSacrifice")) {
+      return [
+        "The tribe is confused as to what they must do to please you.",
+        "The tribe is glad that this sacrifice pleases you."
+      ]
+    }
+    else {
+      return [
+        `The tribe is glad to have earned your favour.`,
+        `The tribe is scared that they have displeased you.
+        As they leave the temple, their priests discuss what must be done to earn
+        your favour.`
+      ];
+    }
+  }
+
+  static outcomeFunctions(tribe: Tribe, region: Region) : (() => void)[] {
+    if (tribe.hasCulture("humanSacrifice")) {
+      return [
+        function () {
+          tribe.decreasePopulation(1);
+          if (Random.chance(0.2)) tribe.removeCulture("humanSacrifice");
+        },
+        function () {
+          tribe.decreasePopulation(1);
+        }
+      ]
+    }
+    else {
+      return [
+        function () {
+        },
+        function () {
+          tribe.addCulture("humanSacrifice");
+        }
+      ];
+    }
+  }
+}
+
 let TribeEvents : TribeEvent[] = [
   TribeDestroyedEvent,
   EncounterEvent,
@@ -1392,6 +1519,7 @@ let TribeEvents : TribeEvent[] = [
   TribeAttacksMonolithEvent,
   TribeRebuildsMonolithEvent,
   GroupBreaksAwayFromInsularTribeEvent,
+  TribeCelebratesMonolithEvent,
   DiplomaticEnvoyEvent,
   FireSpreadsEvent,
   DroughtEvent,

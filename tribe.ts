@@ -226,6 +226,14 @@ class Tribe {
     this._culture.push(culture);
   }
 
+  removeCulture(culture: string) {
+    // Return silently if tribe doesn't have culture.
+    const i = this._culture.indexOf(culture);
+    if (i == -1) return;
+
+    this._culture.splice(i, 1);
+  }
+
   hasCulture(culture: string) : boolean {
     if (this._culture.indexOf(culture) > -1) return true;
     else return false;

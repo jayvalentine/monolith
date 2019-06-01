@@ -208,7 +208,7 @@ class Game {
 
                 if (tribeEvent.isChoice()) {
                   this.queueMessage(tribeEvent.choicePrompt(tribe), function () {});
-                  this.queueChoice(tribeEvent.choices(),
+                  this.queueChoice(tribeEvent.choices(tribe),
                                   tribeEvent.outcomeMessages(tribe, region),
                                   tribeEvent.outcomeFunctions(tribe, region));
                 }
