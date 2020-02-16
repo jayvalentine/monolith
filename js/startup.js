@@ -9,4 +9,8 @@ $(document).ready(function () {
             $("#StartVersionInfo").fadeIn(500, function () { });
         });
     });
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) {
+        $("body").css("border-left", "2px solid");
+        $("body").css("border-right", "2px solid");
+    }
 });
