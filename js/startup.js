@@ -9,9 +9,8 @@ $(document).ready(function () {
             $("#StartVersionInfo").fadeIn(500, function () { });
         });
     });
-    var dpi_x = document.getElementById('dpi').offsetWidth;
-    var width = screen.width / dpi_x;
-    if (width < 5) {
+    var width = screen.width * window.devicePixelRatio;
+    if (width < 700) {
         $("body").css("border-left", "2px solid");
         $("body").css("border-right", "2px solid");
     }

@@ -12,10 +12,9 @@ $(document).ready(function() {
     });
   });
 
-  var dpi_x = document.getElementById('dpi').offsetWidth;
-  var width = screen.width / dpi_x;
+  var width = screen.width * window.devicePixelRatio;
 
-  if (width < 5) {
+  if (width < 700) {
     $("body").css("border-left", "2px solid");
     $("body").css("border-right", "2px solid");
   }
