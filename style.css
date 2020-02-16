@@ -2,6 +2,20 @@ body {
   background-color: #000000;
 }
 
+@media only screen and (min-width: 961px) {
+  body {
+    max-width: 800px;
+    border-left: 30vw solid;
+    border-right: 30vw solid;
+  }
+}
+
+@media only screen and (max-width: 960px) {
+  body {
+    max-width: 960px;
+  }
+}
+
 h1 {
   color: #FFFFFF;
   font-family: Arial, Helvetica, sans-serif;
