@@ -1,18 +1,13 @@
 body {
   background-color: #000000;
+  border-left: 30vw solid;
+  border-right: 30vw solid;
 }
 
-@media only screen and (min-width: 1200px) {
+@media handheld {
   body {
-    max-width: 800px;
-    border-left: 30vw solid;
-    border-right: 30vw solid;
-  }
-}
-
-@media only screen and (max-width: 1199px) {
-  body {
-    max-width: 1200px;
+    border-left: 2px solid;
+    border-right: 2px solid;
   }
 }
 
