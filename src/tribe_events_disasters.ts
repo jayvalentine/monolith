@@ -2,7 +2,7 @@
 // <reference path="tribe.ts">
 // <reference path="region.ts">
 
-class FireSpreadsEvent {
+export class FireSpreadsEvent {
   public static id : string = "FireSpreadsEvent";
 
   static triggers(tribe: Tribe, region: Region, progress: number) {
@@ -89,7 +89,7 @@ class FireSpreadsEvent {
   }
 }
 
-class DroughtEvent {
+export class DroughtEvent {
   public static id : string = "DroughtEvent";
 
   static triggers(tribe: Tribe, region: Region, progress: number) {
@@ -206,7 +206,7 @@ class DroughtEvent {
   }
 }
 
-class PlagueEvent {
+export class PlagueEvent {
     public static id : string = "PlagueEvent";
   
     static triggers(tribe: Tribe, region: Region, progress: number) {

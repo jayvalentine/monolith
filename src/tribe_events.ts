@@ -3,6 +3,9 @@
 // <reference path="tribe_events_discovery">
 // <reference path="tribe_events_disasters">
 
+import * as disasters from "./tribe_events_disasters";
+import * as discovery from "./tribe_events_discovery";
+
 interface TribeEvent {
   readonly id : string;
 
@@ -1582,7 +1585,7 @@ class WarlordsTakePowerEvent {
   }
 }
 
-let TribeEvents : TribeEvent[] = [
+export const TribeEvents : TribeEvent[] = [
   TribeDestroyedEvent,
   EncounterEvent,
   IndirectEncounterEvent,
@@ -1596,18 +1599,20 @@ let TribeEvents : TribeEvent[] = [
   GroupBreaksAwayFromInsularTribeEvent,
   TribeCelebratesMonolithEvent,
   DiplomaticEnvoyEvent,
-  FireSpreadsEvent,
-  DroughtEvent,
-  PlagueEvent,
   FirstStoriesEvent,
   OralHistoryEvent,
   PriestClassEvent,
   WarlordsTakePowerEvent,
   AttackEvent,
   MigrationEvent,
-  DiscoverFireEvent,
-  DiscoverToolsEvent,
-  DiscoverConstructionEvent,
-  DiscoverLanguageEvent,
-  DiscoverAgricultureEvent,
+
+  disasters.FireSpreadsEvent,
+  disasters.DroughtEvent,
+  disasters.PlagueEvent,
+  
+  discovery.DiscoverFireEvent,
+  discovery.DiscoverToolsEvent,
+  discovery.DiscoverConstructionEvent,
+  discovery.DiscoverLanguageEvent,
+  discovery.DiscoverAgricultureEvent,
 ]

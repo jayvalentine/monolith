@@ -1,6 +1,6 @@
-// <reference path="./global">
+import { game } from "./global"
 
-function startPrologue() {
+export function startPrologue() {
   $("#GameStartScreen").hide();
   $("#GameMainScreen").hide();
 
@@ -26,11 +26,11 @@ function startPrologue() {
   });
 }
 
-function startMainGame() {
+export function startMainGame() {
   $("#GamePrologueScreen").hide();
   $("#GameStartScreen").hide();
   $("#GameMainScreen").show();
   $("#GameDate").show();
 
-  Global.game.start();
+  game.start();
 }

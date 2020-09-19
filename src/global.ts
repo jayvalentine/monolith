@@ -1,5 +1,3 @@
-// <reference path="./game">
+import { Game } from "./game";
 
-class Global {
-  public static game: Game = new Game;
-}
+export var game = new Game;

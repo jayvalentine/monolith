@@ -3,7 +3,7 @@
 // <reference path="random">
 // <reference path="tribe">
 
-class Game {
+export class Game {
   private day: number;
 
   private regions: Region[]; 
@@ -331,7 +331,7 @@ class Game {
   }
 }
 
-namespace Game {
+export namespace Game {
   export enum Choice {
     None,
     Waiting,
