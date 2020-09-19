@@ -1,5 +1,5 @@
-/// <reference path="./random.ts">
-/// <reference path="./tribe.ts">
+// <reference path="random">
+// <reference path="tribe">
 
 // A region is a part of the world that can be inhabited by tribes.
 //

@@ -1,7 +1,7 @@
-/// <reference path="random.ts">
-/// <reference path="tribe.ts">
-/// <reference path="region.ts">
-/// <reference path="language.ts">
+// <reference path="random.ts">
+// <reference path="tribe.ts">
+// <reference path="region.ts">
+// <reference path="language.ts">
 
 class DiscoverFireEvent {
     public static readonly id : string = "DiscoverFireEvent";

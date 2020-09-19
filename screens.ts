@@ -1,4 +1,4 @@
-/// <reference path="./global">
+// <reference path="./global">
 
 function startPrologue() {
   $("#GameStartScreen").hide();

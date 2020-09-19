@@ -1,7 +1,7 @@
-/// <reference path="./tribe.ts">
-/// <reference path="./random.ts">
-/// <reference path="./tribe_events_discovery.ts">
-/// <reference path="./tribe_events_disasters.ts">
+// <reference path="tribe">
+// <reference path="random">
+// <reference path="tribe_events_discovery">
+// <reference path="tribe_events_disasters">
 
 interface TribeEvent {
   readonly id : string;

@@ -1,7 +1,7 @@
-/// <reference path="./random.ts">
-/// <reference path="./tribe_events.ts">
-/// <reference path="./language.ts">
-/// <reference path="./idallocator.ts">
+// <reference path="random">
+// <reference path="tribe_events">
+// <reference path="language">
+// <reference path="idallocator">
 
 // A tribe is a group of people with common traits.
 class Tribe {

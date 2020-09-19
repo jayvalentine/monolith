@@ -1,4 +1,4 @@
-/// <reference path="./random.ts">
+// <reference path="random">
 
 const Alphabet : string[] = []
 

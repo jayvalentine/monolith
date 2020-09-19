@@ -1,6 +1,6 @@
-/// <reference path="random.ts">
-/// <reference path="tribe.ts">
-/// <reference path="region.ts">
+// <reference path="random.ts">
+// <reference path="tribe.ts">
+// <reference path="region.ts">
 
 class FireSpreadsEvent {
   public static id : string = "FireSpreadsEvent";

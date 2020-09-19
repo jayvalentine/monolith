@@ -1,4 +1,4 @@
-/// <reference path="./tribe_events.ts">
+// <reference path="tribe_events">
 
 $(document).ready(function() {
   $("#VersionString").text(`Version 0.1 (${TribeEvents.length} events)`);

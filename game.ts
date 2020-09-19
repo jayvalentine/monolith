@@ -1,7 +1,7 @@
-/// <reference path="./region.ts">
-/// <reference path="./region_events.ts">
-/// <reference path="./random.ts">
-/// <reference path="./tribe.ts">
+// <reference path="region">
+// <reference path="region_events">
+// <reference path="random">
+// <reference path="tribe">
 
 class Game {
   private day: number;

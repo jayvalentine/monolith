@@ -1,4 +1,4 @@
-/// <reference path="./region.ts">
+// <reference path="region">
 
 interface RegionEvent {
   triggers(region: Region) : boolean;
