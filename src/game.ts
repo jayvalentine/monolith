@@ -1,3 +1,5 @@
+import * as $ from "jquery";
+
 import { Random } from "./random";
 import { Region } from "./region";
 import { RegionEvents } from "./region_events";

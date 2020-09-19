@@ -1,3 +1,5 @@
+import * as $ from "jquery";
+
 import { TribeEvents } from "./tribe_events";
 import { startPrologue, startMainGame } from "./screens";
 

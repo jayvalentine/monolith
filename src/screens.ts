@@ -1,3 +1,5 @@
+import * as $ from "jquery";
+
 import { game } from "./global"
 
 export function startPrologue() {

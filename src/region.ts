@@ -34,15 +34,20 @@ export class Region {
       case 5: return "plentiful";
       case 6: return "abundant";
     }
+
+    return "INVALID";
   }
 
   constructor() {
+    this.hasMonolith = false;
     this._tribes = [];
     this._nearbyRegions = [];
     this._structures = [];
 
     // Choose a random type for the region.
     let t = Random.interval(0, 6);
+    this._type = Region.Type.Undefined;
+
     switch(t) {
       case 0: this._type = Region.Type.Desert; break;
       case 1: this._type = Region.Type.Grassland; break;
@@ -78,6 +83,7 @@ export class Region {
       case Region.Type.Tundra: return "tundra";
       case Region.Type.Valley: return "valley";
       case Region.Type.Rainforest: return "rainforest";
+      case Region.Type.Undefined: return "UNDEFINED";
     }
   }
 
@@ -91,6 +97,7 @@ export class Region {
       case Region.Type.Tundra: return "tundra";
       case Region.Type.Valley: return "valley";
       case Region.Type.Rainforest: return "rainforest";
+      case Region.Type.Undefined: return "UNDEFINED";
     }
   }
 
@@ -104,6 +111,7 @@ export class Region {
       case Region.Type.Tundra: return this._food - 1;
       case Region.Type.Valley: return this._food + 1;
       case Region.Type.Rainforest: return this._food + 2;
+      case Region.Type.Undefined: return 0;
     }
   }
 
@@ -122,6 +130,7 @@ export class Region {
       case Region.Type.Tundra: return this._water - 1;
       case Region.Type.Valley: return this._water + 2;
       case Region.Type.Rainforest: return this._water;
+      case Region.Type.Undefined: return 0;
     }
   }
 
@@ -140,6 +149,7 @@ export class Region {
       case Region.Type.Tundra: return this._resources;
       case Region.Type.Valley: return this._resources - 1;
       case Region.Type.Rainforest: return this._resources;
+      case Region.Type.Undefined: return 0;
     }
   }
 
@@ -219,5 +229,6 @@ export namespace Region {
     Tundra = "Tundra",
     Valley = "Valley",
     Rainforest = "Rainforest",
+    Undefined = "Undefined"
   }
 }
