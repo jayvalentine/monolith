@@ -1,4 +1,4 @@
-class IDAllocator {
+export class IDAllocator {
   private static ids : Object = {};
 
   static allocate(base: string) : string {

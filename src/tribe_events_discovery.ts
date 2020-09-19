@@ -1,7 +1,7 @@
-// <reference path="random.ts">
-// <reference path="tribe.ts">
-// <reference path="region.ts">
-// <reference path="language.ts">
+import { Random } from "./random";
+import { Tribe, Attitudes } from "./tribe";
+import { Region } from "./region";
+import { Language, Noun } from "./language";
 
 export class DiscoverFireEvent {
     public static readonly id : string = "DiscoverFireEvent";

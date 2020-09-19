@@ -1,10 +1,9 @@
-// <reference path="random">
-// <reference path="tribe_events">
-// <reference path="language">
-// <reference path="idallocator">
+import { Random } from "./random";
+import { IDAllocator } from "./idallocator";
+import { Language, Noun } from "./language";
 
 // A tribe is a group of people with common traits.
-class Tribe {
+export class Tribe {
   private _population : number;
 
   private _migrationChance : number;
@@ -278,7 +277,7 @@ class Tribe {
   }
 }
 
-class Attitudes {
+export class Attitudes {
   public monolith: Attitudes.Monolith;
   public others: Attitudes.Others;
   public world: Attitudes.World;
@@ -339,7 +338,7 @@ class Attitudes {
   }
 }
 
-namespace Attitudes {
+export namespace Attitudes {
   export enum Monolith {
     Unencountered = "unencountered",
     Curious = "curious",

@@ -1,4 +1,4 @@
-// <reference path="region">
+import { Region } from "./region";
 
 interface RegionEvent {
   triggers(region: Region) : boolean;
@@ -32,6 +32,6 @@ class LandingEvent {
   }
 }
 
-let RegionEvents : RegionEvent[] = [
+export const RegionEvents : RegionEvent[] = [
   LandingEvent,
 ]

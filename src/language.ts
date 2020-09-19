@@ -1,4 +1,4 @@
-// <reference path="random">
+import { Random } from "./random";
 
 const Alphabet : string[] = []
 
@@ -20,7 +20,7 @@ class Suffix {
     }
 }
 
-class Noun {
+export class Noun {
     public readonly base : string;
     
     public readonly plural : boolean;
@@ -36,7 +36,7 @@ class Noun {
     }
 }
 
-class Language {
+export class Language {
     public static capitalize(word: string) : string {
         let restOfWord : string = word.slice(1);
         return word.charAt(0).toUpperCase() + restOfWord;
@@ -171,7 +171,7 @@ class Language {
     }
 }
 
-namespace Language {
+export namespace Language {
     export enum Position {
         Before = "Before",
         After = "After",

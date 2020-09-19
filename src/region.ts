@@ -1,5 +1,5 @@
-// <reference path="random">
-// <reference path="tribe">
+import { Random } from "./random";
+import { Tribe } from "./tribe";
 
 // A region is a part of the world that can be inhabited by tribes.
 //
@@ -7,7 +7,7 @@
 // food: level of food available in the region.
 // water: level of water available in the region.
 // resources: level of resources available in the region.
-class Region {
+export class Region {
   private _food: number;
   private _water: number;
   private _resources: number;
@@ -210,7 +210,7 @@ class Region {
   }
 }
 
-namespace Region {
+export namespace Region {
   export enum Type {
     Desert = "Desert",
     Grassland = "Grassland",

@@ -1,7 +1,7 @@
-// <reference path="tribe">
-// <reference path="random">
-// <reference path="tribe_events_discovery">
-// <reference path="tribe_events_disasters">
+import {Region } from "./region";
+import { Tribe, Attitudes } from "./tribe";
+import { Random } from "./random";
+import { Language, Noun } from "./language";
 
 import * as disasters from "./tribe_events_disasters";
 import * as discovery from "./tribe_events_discovery";
@@ -1117,7 +1117,7 @@ class GroupBreaksAwayFromInsularTribeEvent {
     if (tribe.name().length > 0) {
       // Get descriptor for tribe.
       const roll = Random.interval(0, 4);
-      let descriptor : string;
+      let descriptor : string = "";
       switch (roll) {
         case 0: descriptor = "exile"; break;
         case 1: descriptor = "fugitive"; break;

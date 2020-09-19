@@ -1,7 +1,8 @@
-// <reference path="region">
-// <reference path="region_events">
-// <reference path="random">
-// <reference path="tribe">
+import { Random } from "./random";
+import { Region } from "./region";
+import { RegionEvents } from "./region_events";
+import { Tribe, Attitudes } from "./tribe";
+import {TribeEvents } from "./tribe_events";
 
 export class Game {
   private day: number;
@@ -322,7 +323,8 @@ export class Game {
     console.log(`Displaying choice ${index}.`);
 
     // Fade the choice in. Trigger the run method again once the fade in has completed.
-    $(`<p id='choice-${index}' class='clickable' onclick='Global.game.makeChoice(${index})'>${choice}</p>`)
+    $(`<p id='choice-${index}' class='clickable'>${choice}</p>`)
+    .click(() => this.makeChoice(index))
     .insertBefore("#GameDate")
     .hide().fadeIn(500, this.run.bind(this));
 
